@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lowe's Production Plan Dashboard</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        lowes: {
+                            navy: '#002244',
+                            blue: '#004990',
+                            accent: '#0072CE',
+                            yellow: '#FFC20E',
+                            yellowDark: '#E5AB00',
+                            lightBg: '#F4F7FA',
+                            border: '#E2E8F0'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .active-phase-card {
+            border: 2px solid #004990;
+            box-shadow: 0 16px 32px -6px rgba(0, 73, 144, 0.18);
+        }
+        .compact-table td, .compact-table th {
+            padding-top: 0.375rem;
+            padding-bottom: 0.375rem;
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+        .compact-row {
+            transition: background-color 0.15s ease-in-out;
+        }
+        .compact-row:hover {
+            background-color: #f1f5f9;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .badge-yellow {
+            background-color: #FFC20E;
+            color: #002244;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 antialiased selection:bg-blue-100 selection:text-lowes-navy">
+
+    <!-- TOP NAVIGATION BAR -->
+    <header class="bg-lowes-navy text-white sticky top-0 z-40 shadow-lg border-b-4 border-lowes-yellow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                
+                <!-- Brand Logo & Title -->
+                <div class="flex items-center space-x-3">
+                    <div class="bg-white p-1 rounded-lg flex items-center justify-center shadow-md h-10 px-2 overflow-hidden">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTieAHsEFqZAlDOTFpxXIGzjHQmNKsaHFmznahGo4Reiw&s=10" 
+                             alt="Lowe's Logo" 
+                             class="h-8 object-contain"
+                             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'bg-lowes-yellow text-lowes-navy p-2 rounded-lg font-black text-lg flex items-center justify-center h-8 w-8\'>L</div>';">
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-black text-lg sm:text-xl tracking-tight text-white">LOWE'S</span>
+                            <span class="text-[11px] bg-sky-500/30 text-sky-200 border border-sky-400/30 px-2 py-0.5 rounded font-semibold tracking-wide uppercase">Production Plan Tracker</span>
+                        </div>
+                        <p class="text-[11px] text-slate-300 font-light hidden sm:block">Locker Assembly Line, QA Transfers & Blocker Control</p>
+                    </div>
+                </div>
+
+                <!-- Live Database Status & Header Action -->
+                <div class="flex items-center space-x-3">
+                    <!-- Strict Firebase Database Status Badge -->
+                    <div id="db-status-badge" class="flex items-center space-x-2 bg-slate-900/80 text-slate-200 text-xs px-3 py-1.5 rounded-full border border-slate-700 shadow-inner">
+                        <span id="db-status-dot" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+                        <span id="db-status-text" class="font-medium">Connecting Firebase...</span>
+                    </div>
+
+                    <button onclick="openAddPhaseModal()" class="bg-lowes-yellow hover:bg-lowes-yellowDark text-lowes-navy font-bold text-xs sm:text-sm px-4 py-2 rounded-lg transition-all shadow-md flex items-center space-x-1.5 active:scale-95">
+                        <i class="fa-solid fa-plus text-xs"></i>
+                        <span>Add Production Phase</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN APPLICATION CONTENT -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- CORE METRIC KPI CARDS -->
+        <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            <!-- 1. Target Lockers -->
+            <div class="bg-white rounded-xl p-3.5 border border-slate-200 shadow-xs flex flex-col justify-between">
+                <div class="flex justify-between items-center text-slate-500 text-[11px] font-bold uppercase tracking-wider">
+                    <span>1. Target</span>
+                    <i class="fa-solid fa-bullseye text-blue-500"></i>
+                </div>
+                <div class="mt-2 flex items-baseline justify-between">
+                    <span id="kpi-target-qty" class="text-xl sm:text-2xl font-black text-slate-800">0</span>
+                    <span class="text-[10px] text-slate-400 font-medium">Units</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2.5 overflow-hidden">
+                    <div class="bg-blue-500 h-full rounded-full" style="width: 100%"></div>
+                </div>
+            </div>
+
+            <!-- 2. Built MFG -->
+            <div class="bg-white rounded-xl p-3.5 border border-slate-200 shadow-xs flex flex-col justify-between">
+                <div class="flex justify-between items-center text-slate-500 text-[11px] font-bold uppercase tracking-wider">
+                    <span>2. Built MFG</span>
+                    <i class="fa-solid fa-screwdriver-wrench text-emerald-500"></i>
+                </div>
+                <div class="mt-2 flex items-baseline justify-between">
+                    <span id="kpi-built-qty" class="text-xl sm:text-2xl font-black text-slate-800">0</span>
+                    <span id="kpi-built-pct" class="text-[10px] font-bold text-emerald-600">0%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2.5 overflow-hidden">
+                    <div id="kpi-built-bar" class="bg-emerald-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- 3. Transferred QA -->
+            <div class="bg-white rounded-xl p-3.5 border border-slate-200 shadow-xs flex flex-col justify-between">
+                <div class="flex justify-between items-center text-slate-500 text-[11px] font-bold uppercase tracking-wider">
+                    <span>3. Transferred</span>
+                    <i class="fa-solid fa-truck-ramp-box text-purple-500"></i>
+                </div>
+                <div class="mt-2 flex items-baseline justify-between">
+                    <span id="kpi-qa-qty" class="text-xl sm:text-2xl font-black text-slate-800">0</span>
+                    <span id="kpi-qa-pct" class="text-[10px] font-bold text-purple-600">0%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2.5 overflow-hidden">
+                    <div id="kpi-qa-bar" class="bg-purple-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- 4. QA Approved -->
+            <div class="bg-white rounded-xl p-3.5 border border-slate-200 shadow-xs flex flex-col justify-between">
+                <div class="flex justify-between items-center text-slate-500 text-[11px] font-bold uppercase tracking-wider">
+                    <span>4. Approved</span>
+                    <i class="fa-solid fa-circle-check text-indigo-500"></i>
+                </div>
+                <div class="mt-2 flex items-baseline justify-between">
+                    <span id="kpi-approved-qty" class="text-xl sm:text-2xl font-black text-slate-800">0</span>
+                    <span id="kpi-approved-pct" class="text-[10px] font-bold text-indigo-600">0%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2.5 overflow-hidden">
+                    <div id="kpi-approved-bar" class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- 5. Open Issues -->
+            <div class="bg-white rounded-xl p-3.5 border border-rose-200 bg-rose-50/20 shadow-xs flex flex-col justify-between">
+                <div class="flex justify-between items-center text-rose-700 text-[11px] font-bold uppercase tracking-wider">
+                    <span>5. Open Issues</span>
+                    <i class="fa-solid fa-triangle-exclamation text-rose-500"></i>
+                </div>
+                <div class="mt-2 flex items-baseline justify-between">
+                    <span id="kpi-open-issues-count" class="text-xl sm:text-2xl font-black text-rose-600">0</span>
+                    <span id="kpi-high-issues-tag" class="text-[10px] bg-rose-100 text-rose-800 font-bold px-1.5 py-0.5 rounded">0 High</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2.5 overflow-hidden">
+                    <div id="kpi-issues-bar" class="bg-rose-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- 6. Active Focus Phase -->
+            <div class="bg-white rounded-xl p-3.5 border border-slate-200 shadow-xs flex flex-col justify-between">
+                <div class="flex justify-between items-center text-slate-500 text-[11px] font-bold uppercase tracking-wider">
+                    <span>6. Active Focus</span>
+                    <i class="fa-solid fa-star text-amber-500"></i>
+                </div>
+                <div class="mt-1">
+                    <span id="kpi-active-phase-name" class="text-xs font-extrabold text-slate-800 truncate block">None Active</span>
+                    <span id="kpi-total-phases" class="text-[10px] text-slate-500 font-medium">0 Phases Total</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2.5 overflow-hidden">
+                    <div class="bg-amber-500 h-full rounded-full" style="width: 100%"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TOOLBAR & SEARCH FILTER -->
+        <section class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-sliders text-lowes-blue"></i>
+                <h2 class="text-xs sm:text-sm font-bold text-slate-800">Production Plan Control Panel</h2>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+                <!-- Search Input -->
+                <div class="relative flex-1 sm:w-64">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                    <input type="text" id="search-input" oninput="renderDashboard()" placeholder="Filter phase or blocker text..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-lowes-blue/40">
+                </div>
+
+                <!-- Filter Dropdown -->
+                <select id="issue-filter" onchange="renderDashboard()" class="py-1.5 px-2.5 text-xs bg-slate-50 border border-slate-200 rounded-lg text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-lowes-blue/40">
+                    <option value="all">All Phases</option>
+                    <option value="has-issues">Has Open Issues</option>
+                    <option value="high-priority">High Priority Issues</option>
+                </select>
+
+                <button onclick="openAddPhaseModal()" class="bg-lowes-navy hover:bg-slate-800 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition flex items-center space-x-1 shadow-sm">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                    <span>New Phase</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- DYNAMIC DASHBOARD CONTAINER (ACTIVE BIG BOXES + REMAINING COMPACT TABLE) -->
+        <div id="dashboard-content" class="space-y-6">
+            <!-- Dynamically populated via JavaScript -->
+            <div class="text-center py-12 bg-white rounded-xl border border-slate-200">
+                <i class="fa-solid fa-spinner fa-spin text-lowes-blue text-2xl mb-2"></i>
+                <p class="text-xs font-semibold text-slate-500">Loading production plan live data from Firebase...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ADD / EDIT PHASE MODAL -->
+    <div id="phase-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden my-8">
+            <div class="bg-lowes-navy text-white px-6 py-4 flex items-center justify-between border-b-2 border-lowes-yellow">
+                <div>
+                    <h3 class="font-bold text-base flex items-center space-x-2">
+                        <i class="fa-solid fa-boxes-packing text-lowes-yellow"></i>
+                        <span id="modal-title">Add Production Phase</span>
+                    </h3>
+                    <p class="text-xs text-slate-300 font-light">Configure target locker quantities and manufacturing schedule.</p>
+                </div>
+                <button onclick="closePhaseModal()" class="text-slate-300 hover:text-white text-lg p-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="phase-form" onsubmit="savePhaseForm(event)" class="p-6 space-y-4 text-xs">
+                <input type="hidden" id="form-phase-id">
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Phase Name / Production Line</label>
+                    <input type="text" id="form-phase-name" required placeholder="e.g., Phase 1: Frame Assembly & Lock Integration" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-lowes-blue/50">
+                </div>
+
+                <!-- Active Status Toggle -->
+                <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-star text-amber-500 text-base"></i>
+                        <div>
+                            <div class="font-bold text-amber-900">Set as Active Focus Phase</div>
+                            <div class="text-[10px] text-amber-700">Promotes phase to top prominent big box dashboard view.</div>
+                        </div>
+                    </div>
+                    <input type="checkbox" id="form-is-active" class="w-4 h-4 text-lowes-blue rounded focus:ring-lowes-blue cursor-pointer">
+                </div>
+
+                <!-- 1. TARGET LOCKERS -->
+                <div class="p-3 bg-blue-50/60 border border-blue-200 rounded-xl space-y-2">
+                    <div class="font-bold text-blue-900 uppercase tracking-wider text-[11px] flex items-center space-x-1.5">
+                        <i class="fa-solid fa-bullseye text-blue-600"></i>
+                        <span>1. Target Lockers</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-medium text-slate-600 mb-1">Target Quantity</label>
+                            <input type="number" id="form-target-qty" min="1" required class="w-full p-2 bg-white border border-slate-200 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-600 mb-1">Est. Build Complete Date</label>
+                            <input type="date" id="form-est-date" required class="w-full p-2 bg-white border border-slate-200 rounded-lg">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. BUILT FROM MFG -->
+                <div class="p-3 bg-emerald-50/60 border border-emerald-200 rounded-xl space-y-2">
+                    <div class="font-bold text-emerald-900 uppercase tracking-wider text-[11px] flex items-center space-x-1.5">
+                        <i class="fa-solid fa-screwdriver-wrench text-emerald-600"></i>
+                        <span>2. Built from MFG</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-medium text-slate-600 mb-1">Built Quantity</label>
+                            <input type="number" id="form-built-qty" min="0" required class="w-full p-2 bg-white border border-slate-200 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-600 mb-1">Actual Build Date</label>
+                            <input type="date" id="form-built-date" class="w-full p-2 bg-white border border-slate-200 rounded-lg">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. TRANSFERRED TO QA -->
+                <div class="p-3 bg-purple-50/60 border border-purple-200 rounded-xl space-y-2">
+                    <div class="font-bold text-purple-900 uppercase tracking-wider text-[11px] flex items-center space-x-1.5">
+                        <i class="fa-solid fa-truck-ramp-box text-purple-600"></i>
+                        <span>3. Transferred to QA</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-medium text-slate-600 mb-1">Transferred Quantity</label>
+                            <input type="number" id="form-qa-qty" min="0" required class="w-full p-2 bg-white border border-slate-200 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-600 mb-1">QA Transfer Date</label>
+                            <input type="date" id="form-qa-date" class="w-full p-2 bg-white border border-slate-200 rounded-lg">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. QA APPROVED -->
+                <div class="p-3 bg-indigo-50/60 border border-indigo-200 rounded-xl space-y-2">
+                    <div class="font-bold text-indigo-900 uppercase tracking-wider text-[11px] flex items-center space-x-1.5">
+                        <i class="fa-solid fa-circle-check text-indigo-600"></i>
+                        <span>4. QA Approved</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-medium text-slate-600 mb-1">Approved Quantity</label>
+                            <input type="number" id="form-approved-qty" min="0" required class="w-full p-2 bg-white border border-slate-200 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block font-medium text-slate-600 mb-1">QA Approval Date</label>
+                            <input type="date" id="form-approved-date" class="w-full p-2 bg-white border border-slate-200 rounded-lg">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- General Notes -->
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Station Remarks / Notes</label>
+                    <textarea id="form-notes" rows="2" placeholder="Station operational details..." class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-lowes-blue/50"></textarea>
+                </div>
+
+                <!-- Footer Action Buttons -->
+                <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+                    <button type="button" onclick="promptDeletePhaseFromModal()" id="btn-delete-phase" class="text-red-600 hover:text-red-800 font-semibold px-3 py-2 rounded-lg hover:bg-red-50 transition">
+                        <i class="fa-solid fa-trash-can mr-1"></i> Delete Phase
+                    </button>
+
+                    <div class="flex items-center space-x-2">
+                        <button type="button" onclick="closePhaseModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-2 rounded-lg transition">
+                            Cancel
+                        </button>
+                        <button type="submit" class="bg-lowes-blue hover:bg-blue-800 text-white font-bold px-5 py-2 rounded-lg shadow-sm transition flex items-center space-x-1">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            <span>Save Phase</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CUSTOM CONFIRMATION MODAL -->
+    <div id="confirm-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full shadow-2xl border border-slate-200 overflow-hidden p-6 text-center space-y-4">
+            <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto text-xl shadow-inner">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div>
+                <h3 id="confirm-modal-title" class="text-base font-bold text-slate-900">Are you sure?</h3>
+                <p id="confirm-modal-msg" class="text-xs text-slate-500 mt-1">This action will update Firebase Firestore immediately.</p>
+            </div>
+            <div class="flex items-center justify-center space-x-3 pt-2">
+                <button onclick="closeConfirmModal(false)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-2 rounded-lg text-xs transition">
+                    Cancel
+                </button>
+                <button id="confirm-modal-action-btn" onclick="closeConfirmModal(true)" class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition shadow-sm">
+                    Confirm Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 border border-slate-700">
+            <span id="toast-icon" class="text-emerald-400 text-lg"><i class="fa-solid fa-circle-check"></i></span>
+            <span id="toast-msg" class="text-xs font-medium">Database updated successfully</span>
+        </div>
+    </div>
+
+    <!-- FIREBASE SDK v11.6.1 ES MODULES INTEGRATION -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, onSnapshot, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Provided Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDJp3vhQPejd52qWsSIwmn-kflCKm9ae_Q",
+            authDomain: "lowes-order.firebaseapp.com",
+            projectId: "lowes-order",
+            storageBucket: "lowes-order.firebasestorage.app",
+            messagingSenderId: "1054468592116",
+            appId: "1:1054468592116:web:149b6c09c5a4555c62a9a1",
+            measurementId: "G-T030V2KYGL"
+        };
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'lowes-production-dashboard';
+
+        // Global State Definition
+        window.appState = {
+            phases: [],
+            db: null,
+            auth: null,
+            user: null,
+            pendingConfirmCallback: null
+        };
+
+        // Initialize Firebase strictly
+        let app, auth, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            window.appState.db = db;
+            window.appState.auth = auth;
+
+            // Authentication sequence before Firestore access (Rule 3)
+            const initAuth = async () => {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    return await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    return await signInAnonymously(auth);
+                }
+            };
+
+            initAuth().then((userCred) => {
+                window.appState.user = userCred.user;
+                updateDbStatusBadge(true, "Firebase Live Database");
+                subscribeToFirestore();
+            }).catch(err => {
+                console.error("Firebase Auth Error:", err);
+                updateDbStatusBadge(false, "Firebase Auth Error");
+                renderErrorState("Authentication with Firebase Firestore failed: " + err.message);
+            });
+
+        } catch (e) {
+            console.error("Firebase Init Error:", e);
+            updateDbStatusBadge(false, "Firebase Init Error");
+            renderErrorState("Failed to initialize Firebase SDK: " + e.message);
+        }
+
+        // Firestore Subscription (Rule 1 Path: /artifacts/{appId}/public/data/production_phases)
+        function subscribeToFirestore() {
+            const phasesCollection = collection(db, 'artifacts', appId, 'public', 'data', 'production_phases');
+
+            onSnapshot(phasesCollection, (snapshot) => {
+                const loadedPhases = [];
+                snapshot.forEach(docSnap => {
+                    loadedPhases.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                
+                // Sort phases alphabetically
+                loadedPhases.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                window.appState.phases = loadedPhases;
+                updateDbStatusBadge(true, "Firebase Live Database");
+                window.renderDashboard();
+            }, (error) => {
+                console.error("Firestore Realtime Listener Error:", error);
+                updateDbStatusBadge(false, "Firestore Sync Error");
+                renderErrorState("Firestore connection error: " + error.message);
+            });
+        }
+
+        function updateDbStatusBadge(isConnected, labelText) {
+            const dotEl = document.getElementById('db-status-dot');
+            const txtEl = document.getElementById('db-status-text');
+            const badgeEl = document.getElementById('db-status-badge');
+
+            if (txtEl) txtEl.textContent = labelText;
+            if (dotEl) {
+                if (isConnected) {
+                    dotEl.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
+                    badgeEl.className = "flex items-center space-x-2 bg-emerald-950/80 text-emerald-200 text-xs px-3 py-1.5 rounded-full border border-emerald-700 shadow-inner";
+                } else {
+                    dotEl.className = "w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse";
+                    badgeEl.className = "flex items-center space-x-2 bg-rose-950/80 text-rose-200 text-xs px-3 py-1.5 rounded-full border border-rose-700 shadow-inner";
+                }
+            }
+        }
+
+        function renderErrorState(errMsg) {
+            const container = document.getElementById('dashboard-content');
+            if (container) {
+                container.innerHTML = `
+                    <div class="bg-rose-50 border border-rose-200 rounded-2xl p-8 text-center max-w-xl mx-auto my-8">
+                        <i class="fa-solid fa-triangle-exclamation text-rose-600 text-3xl mb-3"></i>
+                        <h3 class="text-base font-bold text-rose-900">Firestore Connection Alert</h3>
+                        <p class="text-xs text-rose-700 mt-1">${errMsg}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Save or update phase to Firestore strictly
+        window.savePhaseToDb = async function(phaseData) {
+            if (!db || !window.appState.user) {
+                showToast("Cannot write: Firebase unauthenticated");
+                return;
+            }
+
+            try {
+                // Handle active phase exclusivity if set to active
+                if (phaseData.isActive) {
+                    const updates = window.appState.phases.map(p => {
+                        if (p.id !== phaseData.id && p.isActive) {
+                            const ref = doc(db, 'artifacts', appId, 'public', 'data', 'production_phases', p.id);
+                            return setDoc(ref, { isActive: false }, { merge: true });
+                        }
+                        return Promise.resolve();
+                    });
+                    await Promise.all(updates);
+                }
+
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'production_phases', phaseData.id);
+                await setDoc(docRef, phaseData, { merge: true });
+                showToast("Saved to Firebase Live Database!");
+            } catch (e) {
+                console.error("Firestore Write Error:", e);
+                showToast("Error saving to Firebase: " + e.message);
+            }
+        };
+
+        window.deletePhaseFromDb = async function(phaseId) {
+            if (!db || !window.appState.user) {
+                showToast("Cannot delete: Firebase unauthenticated");
+                return;
+            }
+
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'production_phases', phaseId);
+                await deleteDoc(docRef);
+                showToast("Deleted from Firebase Firestore!");
+            } catch (e) {
+                console.error("Firestore Delete Error:", e);
+                showToast("Error deleting: " + e.message);
+            }
+        };
+    </script>
+
+    <script>
+        // MAIN DASHBOARD RENDERER
+        function renderDashboard() {
+            const phases = window.appState.phases || [];
+            
+            // Calculate Top KPI Aggregations
+            let totalTarget = 0;
+            let totalBuilt = 0;
+            let totalQA = 0;
+            let totalApproved = 0;
+            let totalOpenIssues = 0;
+            let totalHighIssues = 0;
+            let activePhaseObj = null;
+
+            phases.forEach(p => {
+                totalTarget += Number(p.targetQty || 0);
+                totalBuilt += Number(p.builtQty || 0);
+                totalQA += Number(p.qaQty || 0);
+                totalApproved += Number(p.approvedQty || 0);
+
+                if (p.isActive) {
+                    activePhaseObj = p;
+                }
+
+                // Count issues
+                const issues = p.issues || [];
+                issues.forEach(iss => {
+                    if (iss.status === 'Open') {
+                        totalOpenIssues++;
+                        if (iss.priority === 'High') totalHighIssues++;
+                    }
+                });
+            });
+
+            // Update KPI DOM Cards
+            const builtPct = totalTarget > 0 ? Math.round((totalBuilt / totalTarget) * 100) : 0;
+            const qaPct = totalBuilt > 0 ? Math.round((totalQA / totalBuilt) * 100) : 0;
+            const approvedPct = totalQA > 0 ? Math.round((totalApproved / totalQA) * 100) : 0;
+
+            document.getElementById('kpi-target-qty').textContent = totalTarget.toLocaleString();
+            
+            document.getElementById('kpi-built-qty').textContent = totalBuilt.toLocaleString();
+            document.getElementById('kpi-built-pct').textContent = builtPct + '% of target';
+            document.getElementById('kpi-built-bar').style.width = Math.min(builtPct, 100) + '%';
+
+            document.getElementById('kpi-qa-qty').textContent = totalQA.toLocaleString();
+            document.getElementById('kpi-qa-pct').textContent = qaPct + '% of built';
+            document.getElementById('kpi-qa-bar').style.width = Math.min(qaPct, 100) + '%';
+
+            document.getElementById('kpi-approved-qty').textContent = totalApproved.toLocaleString();
+            document.getElementById('kpi-approved-pct').textContent = approvedPct + '% of transferred';
+            document.getElementById('kpi-approved-bar').style.width = Math.min(approvedPct, 100) + '%';
+
+            document.getElementById('kpi-open-issues-count').textContent = totalOpenIssues.toLocaleString();
+            document.getElementById('kpi-high-issues-tag').textContent = `${totalHighIssues} High Priority`;
+            const issueBarPct = totalOpenIssues > 0 ? Math.min(totalOpenIssues * 25, 100) : 0;
+            document.getElementById('kpi-issues-bar').style.width = issueBarPct + '%';
+
+            document.getElementById('kpi-active-phase-name').textContent = activePhaseObj ? activePhaseObj.name : "None Active";
+            document.getElementById('kpi-total-phases').textContent = `${phases.length} Phase${phases.length !== 1 ? 's' : ''} Total`;
+
+            // Filter logic
+            const searchQuery = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+            const issueFilter = document.getElementById('issue-filter')?.value || 'all';
+
+            const filteredPhases = phases.filter(p => {
+                const matchSearch = !searchQuery || 
+                    p.name.toLowerCase().includes(searchQuery) || 
+                    (p.notes && p.notes.toLowerCase().includes(searchQuery)) ||
+                    (p.issues && p.issues.some(i => i.text.toLowerCase().includes(searchQuery)));
+
+                let matchIssue = true;
+                if (issueFilter === 'has-issues') {
+                    matchIssue = p.issues && p.issues.some(i => i.status === 'Open');
+                } else if (issueFilter === 'high-priority') {
+                    matchIssue = p.issues && p.issues.some(i => i.status === 'Open' && i.priority === 'High');
+                }
+
+                return matchSearch && matchIssue;
+            });
+
+            const container = document.getElementById('dashboard-content');
+            if (!container) return;
+
+            // Handle Empty State
+            if (filteredPhases.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl border border-slate-200 p-12 text-center shadow-xs max-w-xl mx-auto my-6">
+                        <div class="w-16 h-16 bg-blue-50 text-lowes-navy rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
+                            <i class="fa-solid fa-boxes-stacked"></i>
+                        </div>
+                        <h3 class="text-base font-bold text-slate-800">No Production Phases Found in Firestore</h3>
+                        <p class="text-xs text-slate-500 mt-1 max-w-md mx-auto">
+                            ${searchQuery || issueFilter !== 'all' ? 'No phases match your current filter selection.' : 'Get started by creating your first Lowe\'s production phase to track locker manufacturing, QA transfers, and blocker issue notes directly in Firebase.'}
+                        </p>
+                        <div class="mt-6 flex justify-center">
+                            <button onclick="openAddPhaseModal()" class="bg-lowes-yellow hover:bg-lowes-yellowDark text-lowes-navy font-bold text-xs px-5 py-2.5 rounded-xl shadow-md transition flex items-center space-x-2">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>Add Production Phase</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Identify active phase vs inactive remaining phases
+            const activePhase = filteredPhases.find(p => p.isActive) || (phases.length > 0 && !searchQuery ? phases.find(p => p.isActive) : null);
+            const inactivePhases = filteredPhases.filter(p => p !== activePhase);
+
+            let html = '';
+
+            // 1. ACTIVE PHASE BIG BOXES LAYOUT
+            if (activePhase) {
+                html += renderActivePhaseHero(activePhase);
+            } else {
+                html += `
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between text-xs">
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-solid fa-circle-info text-amber-500 text-lg"></i>
+                            <div>
+                                <h4 class="font-bold text-amber-900">No Active Focus Phase Selected</h4>
+                                <p class="text-[11px] text-amber-700">Click "Set Active" on any phase in the remaining list below to promote it to the big box layout.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // 2. REMAINING PHASES COMPACT CELL HEIGHTS TABLE
+            if (inactivePhases.length > 0) {
+                html += `
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+                        <div class="px-5 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <i class="fa-solid fa-list-check text-slate-500 text-xs"></i>
+                                <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                                    Remaining Production Phases (${inactivePhases.length})
+                                </h3>
+                            </div>
+                            <span class="text-[11px] text-slate-400 font-medium">Compact Cell View</span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs text-slate-700 border-collapse compact-table">
+                                <thead class="bg-slate-100/80 text-slate-500 uppercase text-[10px] tracking-wider border-b border-slate-200">
+                                    <tr>
+                                        <th class="font-semibold">Phase / Assembly Line</th>
+                                        <th class="font-semibold text-center">Target Lockers</th>
+                                        <th class="font-semibold text-center">Built MFG</th>
+                                        <th class="font-semibold text-center">Transferred QA</th>
+                                        <th class="font-semibold text-center">QA Approved</th>
+                                        <th class="font-semibold text-center">Blockers</th>
+                                        <th class="font-semibold text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    ${inactivePhases.map(p => renderCompactPhaseRow(p)).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // RENDER ACTIVE HERO WITH 4 LARGE STAT BOXES & ISSUE NOTES WIDGET
+        function renderActivePhaseHero(p) {
+            const target = Number(p.targetQty) || 1;
+            const built = Number(p.builtQty) || 0;
+            const qa = Number(p.qaQty) || 0;
+            const approved = Number(p.approvedQty) || 0;
+
+            const builtPct = Math.min(Math.round((built / target) * 100), 100);
+            const qaPct = built > 0 ? Math.min(Math.round((qa / built) * 100), 100) : 0;
+            const approvedPct = qa > 0 ? Math.min(Math.round((approved / qa) * 100), 100) : 0;
+
+            const issues = p.issues || [];
+            const openIssues = issues.filter(i => i.status === 'Open');
+
+            return `
+                <div class="active-phase-card bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300">
+                    <!-- Hero Header -->
+                    <div class="bg-gradient-to-r from-lowes-navy via-slate-900 to-lowes-navy text-white px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-3 border-b-2 border-lowes-yellow">
+                        <div class="flex items-center space-x-3">
+                            <div class="bg-lowes-yellow text-lowes-navy w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg shadow-md">
+                                <i class="fa-solid fa-star"></i>
+                            </div>
+                            <div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="badge-yellow text-[10px] font-black uppercase px-2 py-0.5 rounded tracking-wider shadow-xs">
+                                        ACTIVE FOCUS PHASE
+                                    </span>
+                                    ${openIssues.length > 0 ? `
+                                        <span class="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded flex items-center space-x-1">
+                                            <i class="fa-solid fa-triangle-exclamation text-[9px]"></i>
+                                            <span>${openIssues.length} Open Blocker${openIssues.length !== 1 ? 's' : ''}</span>
+                                        </span>
+                                    ` : `
+                                        <span class="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">
+                                            <i class="fa-solid fa-circle-check text-[9px] mr-1"></i> No Open Blockers
+                                        </span>
+                                    `}
+                                </div>
+                                <h3 class="font-black text-lg sm:text-xl text-white mt-1">${p.name}</h3>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-2">
+                            <button onclick="togglePhaseActive('${p.id}')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-2 rounded-lg font-medium transition border border-slate-700">
+                                <i class="fa-solid fa-eye-slash mr-1"></i> Minimize Focus
+                            </button>
+                            <button onclick="openEditPhaseModal('${p.id}')" class="bg-lowes-accent hover:bg-blue-600 text-white text-xs font-bold px-3.5 py-2 rounded-lg transition shadow-sm flex items-center space-x-1">
+                                <i class="fa-solid fa-pen-to-square text-xs"></i>
+                                <span>Edit Phase</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 4 LARGE STAT BOXES LAYOUT -->
+                    <div class="p-6 bg-slate-50/70 space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+                            <!-- Box 1: Target Lockers -->
+                            <div class="bg-white rounded-xl p-4 border border-blue-200 shadow-xs flex flex-col justify-between space-y-3">
+                                <div>
+                                    <div class="flex justify-between items-center text-blue-900 font-bold text-xs uppercase tracking-wider">
+                                        <span>a) Target Lockers</span>
+                                        <i class="fa-solid fa-bullseye text-blue-500"></i>
+                                    </div>
+                                    <div class="mt-2 text-2xl font-black text-slate-800">${target.toLocaleString()} <span class="text-xs text-slate-400 font-normal">Units</span></div>
+                                </div>
+                                <div class="pt-3 border-t border-slate-100 text-xs">
+                                    <span class="text-slate-500 block text-[11px]">Est. Build Date:</span>
+                                    <span class="font-bold text-slate-800">${formatDateDisplay(p.estDate) || 'Not set'}</span>
+                                </div>
+                            </div>
+
+                            <!-- Box 2: Built from MFG -->
+                            <div class="bg-white rounded-xl p-4 border border-emerald-200 shadow-xs flex flex-col justify-between space-y-3">
+                                <div>
+                                    <div class="flex justify-between items-center text-emerald-900 font-bold text-xs uppercase tracking-wider">
+                                        <span>b) Built MFG</span>
+                                        <i class="fa-solid fa-screwdriver-wrench text-emerald-500"></i>
+                                    </div>
+                                    <div class="mt-2 flex items-baseline justify-between">
+                                        <span class="text-2xl font-black text-slate-800">${built.toLocaleString()}</span>
+                                        <span class="text-xs font-bold text-emerald-600">${builtPct}%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2 overflow-hidden">
+                                        <div class="bg-emerald-500 h-full rounded-full" style="width: ${builtPct}%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-[11px] text-slate-500 mb-1">Actual Build Date: <strong class="text-slate-800">${formatDateDisplay(p.builtDate) || 'In Progress'}</strong></div>
+                                    <div class="flex items-center space-x-1.5 pt-1">
+                                        <button onclick="quickAddBuilt('${p.id}', 1)" class="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 py-1 rounded font-bold text-xs transition">
+                                            +1 Built
+                                        </button>
+                                        <button onclick="quickAddBuilt('${p.id}', 5)" class="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 py-1 rounded font-bold text-xs transition">
+                                            +5 Built
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Box 3: Transferred to QA -->
+                            <div class="bg-white rounded-xl p-4 border border-purple-200 shadow-xs flex flex-col justify-between space-y-3">
+                                <div>
+                                    <div class="flex justify-between items-center text-purple-900 font-bold text-xs uppercase tracking-wider">
+                                        <span>c) Transferred QA</span>
+                                        <i class="fa-solid fa-truck-ramp-box text-purple-500"></i>
+                                    </div>
+                                    <div class="mt-2 flex items-baseline justify-between">
+                                        <span class="text-2xl font-black text-purple-950">${qa.toLocaleString()}</span>
+                                        <span class="text-xs font-bold text-purple-600">${qaPct}%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2 overflow-hidden">
+                                        <div class="bg-purple-600 h-full rounded-full" style="width: ${qaPct}%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-[11px] text-slate-500 mb-1">QA Date: <strong class="text-slate-800">${formatDateDisplay(p.qaDate) || 'Pending'}</strong></div>
+                                    <button onclick="quickTransferQA('${p.id}')" class="w-full bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-300 py-1 rounded font-bold text-xs transition">
+                                        Transfer All Built
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Box 4: QA Approved -->
+                            <div class="bg-white rounded-xl p-4 border border-indigo-200 shadow-xs flex flex-col justify-between space-y-3">
+                                <div>
+                                    <div class="flex justify-between items-center text-indigo-900 font-bold text-xs uppercase tracking-wider">
+                                        <span>d) QA Approved</span>
+                                        <i class="fa-solid fa-circle-check text-indigo-500"></i>
+                                    </div>
+                                    <div class="mt-2 flex items-baseline justify-between">
+                                        <span class="text-2xl font-black text-indigo-950">${approved.toLocaleString()}</span>
+                                        <span class="text-xs font-bold text-indigo-600">${approvedPct}%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-100 rounded-full h-1.5 mt-2 overflow-hidden">
+                                        <div class="bg-indigo-600 h-full rounded-full" style="width: ${approvedPct}%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-[11px] text-slate-500 mb-1">Approval Date: <strong class="text-slate-800">${formatDateDisplay(p.approvedDate) || 'Pending'}</strong></div>
+                                    <button onclick="quickApproveQA('${p.id}')" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-300 py-1 rounded font-bold text-xs transition">
+                                        Approve All Transferred
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- PHASE BLOCKERS & ISSUE NOTES SECTION -->
+                        <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
+                            <div class="px-5 py-3 bg-slate-100/80 border-b border-slate-200 flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fa-solid fa-clipboard-list text-rose-500 text-xs"></i>
+                                    <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider">
+                                        Phase Issues & Blocker Notes (${issues.length})
+                                    </h4>
+                                </div>
+                                <span class="text-[10px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-bold">Firestore Sync</span>
+                            </div>
+
+                            <div class="p-4 space-y-4">
+                                <!-- Log New Blocker Input Box -->
+                                <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 space-y-2 text-xs">
+                                    <span class="font-bold text-slate-700 block">Log New Issue Note</span>
+                                    <div class="grid grid-cols-1 md:grid-cols-12 gap-2">
+                                        <input type="text" id="new-issue-input-${p.id}" placeholder="Describe blocker or defect note..." class="md:col-span-6 p-2 bg-white border border-slate-200 rounded-lg focus:ring-2 focus:ring-lowes-blue/40">
+                                        <select id="new-issue-severity-${p.id}" class="md:col-span-3 p-2 bg-white border border-slate-200 rounded-lg font-medium">
+                                            <option value="High">🔴 High Severity</option>
+                                            <option value="Medium" selected>🟡 Medium Severity</option>
+                                            <option value="Low">🔵 Low Severity</option>
+                                        </select>
+                                        <button onclick="addIssueToPhase('${p.id}')" class="md:col-span-3 bg-lowes-blue hover:bg-blue-800 text-white font-bold p-2 rounded-lg transition flex items-center justify-center space-x-1 shadow-xs">
+                                            <i class="fa-solid fa-plus"></i>
+                                            <span>Add Issue Note</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Existing Issues List -->
+                                ${issues.length === 0 ? `
+                                    <div class="text-center py-4 text-slate-400 text-xs italic">
+                                        <i class="fa-solid fa-circle-check text-emerald-500 text-base mb-1 block"></i>
+                                        No open blockers logged for this phase.
+                                    </div>
+                                ` : `
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                                        ${issues.map(iss => `
+                                            <div class="p-3 rounded-lg border ${iss.status === 'Open' ? (iss.priority === 'High' ? 'bg-rose-50/60 border-rose-200' : 'bg-amber-50/50 border-amber-200') : 'bg-slate-50 border-slate-200 opacity-70'} text-xs flex flex-col justify-between space-y-2">
+                                                <div class="flex items-start justify-between gap-2">
+                                                    <span class="font-semibold text-slate-800">${iss.text}</span>
+                                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase shrink-0 ${
+                                                        iss.priority === 'High' ? 'bg-red-100 text-red-800 border border-red-200' :
+                                                        iss.priority === 'Medium' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
+                                                        'bg-blue-100 text-blue-800 border border-blue-200'
+                                                    }">${iss.priority}</span>
+                                                </div>
+
+                                                <div class="flex items-center justify-between text-[10px] text-slate-500 pt-1 border-t border-slate-100">
+                                                    <span>Log Date: ${iss.createdAt || 'Today'}</span>
+                                                    <div class="flex items-center space-x-2">
+                                                        <button onclick="toggleIssueStatus('${p.id}', '${iss.id}')" class="font-bold ${iss.status === 'Open' ? 'text-emerald-700 hover:text-emerald-900 underline' : 'text-slate-600 hover:text-slate-900'}">
+                                                            ${iss.status === 'Open' ? 'Mark Resolved' : 'Reopen'}
+                                                        </button>
+                                                        <button onclick="deleteIssueFromPhase('${p.id}', '${iss.id}')" class="text-rose-600 hover:text-rose-800 font-bold">
+                                                            <i class="fa-solid fa-trash-can"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+
+                        ${p.notes ? `
+                            <div class="text-xs bg-sky-50 border border-sky-200 text-sky-950 p-3 rounded-xl">
+                                <i class="fa-solid fa-comment-dots text-sky-600 mr-1.5"></i>
+                                <span><strong>Station Remarks:</strong> ${p.notes}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // COMPACT ROW FOR OTHER PHASES TABLE
+        function renderCompactPhaseRow(p) {
+            const issues = p.issues || [];
+            const openCount = issues.filter(i => i.status === 'Open').length;
+
+            return `
+                <tr class="compact-row border-b border-slate-100 text-xs">
+                    <td class="font-bold text-slate-800">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-2 h-2 rounded-full ${openCount > 0 ? 'bg-rose-500' : 'bg-slate-300'}"></span>
+                            <span>${p.name}</span>
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <div class="font-bold text-slate-800">${(p.targetQty || 0).toLocaleString()}</div>
+                        <div class="text-[10px] text-slate-400">${formatDateDisplay(p.estDate) || '-'}</div>
+                    </td>
+                    <td class="text-center">
+                        <div class="font-bold text-emerald-700">${(p.builtQty || 0).toLocaleString()}</div>
+                        <div class="text-[10px] text-slate-400">${formatDateDisplay(p.builtDate) || '-'}</div>
+                    </td>
+                    <td class="text-center">
+                        <div class="font-bold text-purple-800">${(p.qaQty || 0).toLocaleString()}</div>
+                        <div class="text-[10px] text-slate-400">${formatDateDisplay(p.qaDate) || '-'}</div>
+                    </td>
+                    <td class="text-center">
+                        <div class="font-bold text-indigo-800">${(p.approvedQty || 0).toLocaleString()}</div>
+                        <div class="text-[10px] text-slate-400">${formatDateDisplay(p.approvedDate) || '-'}</div>
+                    </td>
+                    <td class="text-center">
+                        ${openCount === 0 ? `
+                            <span class="text-[10px] text-slate-400">0 Open</span>
+                        ` : `
+                            <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
+                                ${openCount} Open
+                            </span>
+                        `}
+                    </td>
+                    <td class="text-right">
+                        <div class="flex items-center justify-end space-x-1">
+                            <button onclick="togglePhaseActive('${p.id}')" class="text-[11px] bg-slate-100 hover:bg-amber-100 text-slate-700 hover:text-amber-900 font-semibold px-2 py-0.5 rounded transition border border-slate-200">
+                                <i class="fa-solid fa-star text-amber-500 mr-1"></i> Set Active
+                            </button>
+                            <button onclick="openEditPhaseModal('${p.id}')" class="text-lowes-blue hover:text-blue-900 font-bold px-2 py-0.5 rounded bg-blue-50 hover:bg-blue-100 transition">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button onclick="confirmDeletePhase('${p.id}')" class="text-rose-600 hover:text-rose-800 font-bold px-1.5 py-0.5 rounded hover:bg-rose-50 transition">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Helper date display
+        function formatDateDisplay(dateStr) {
+            if (!dateStr) return '';
+            try {
+                const parts = dateStr.split('-');
+                if (parts.length === 3) {
+                    const d = new Date(parts[0], parts[1] - 1, parts[2]);
+                    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                }
+                return dateStr;
+            } catch (e) {
+                return dateStr;
+            }
+        }
+
+        // QUICK ACTIONS
+        window.quickAddBuilt = function(phaseId, amount) {
+            const phase = window.appState.phases.find(p => p.id === phaseId);
+            if (!phase) return;
+
+            const target = Number(phase.targetQty) || 100;
+            const currentBuilt = Number(phase.builtQty) || 0;
+            phase.builtQty = Math.min(currentBuilt + amount, target);
+            phase.builtDate = new Date().toISOString().split('T')[0];
+
+            window.savePhaseToDb(phase);
+        };
+
+        window.quickTransferQA = function(phaseId) {
+            const phase = window.appState.phases.find(p => p.id === phaseId);
+            if (!phase) return;
+
+            const built = Number(phase.builtQty) || 0;
+            phase.qaQty = built;
+            phase.qaDate = new Date().toISOString().split('T')[0];
+
+            window.savePhaseToDb(phase);
+        };
+
+        window.quickApproveQA = function(phaseId) {
+            const phase = window.appState.phases.find(p => p.id === phaseId);
+            if (!phase) return;
+
+            const qa = Number(phase.qaQty) || 0;
+            phase.approvedQty = qa;
+            phase.approvedDate = new Date().toISOString().split('T')[0];
+
+            window.savePhaseToDb(phase);
+        };
+
+        window.togglePhaseActive = function(phaseId) {
+            const phase = window.appState.phases.find(p => p.id === phaseId);
+            if (!phase) return;
+
+            phase.isActive = !phase.isActive;
+            window.savePhaseToDb(phase);
+        };
+
+        // ISSUE NOTE ACTIONS
+        window.addIssueToPhase = function(phaseId) {
+            const phase = window.appState.phases.find(p => p.id === phaseId);
+            if (!phase) return;
+
+            const inputEl = document.getElementById(`new-issue-input-${phaseId}`);
+            const severityEl = document.getElementById(`new-issue-severity-${phaseId}`);
+
+            const text = inputEl ? inputEl.value.trim() : '';
+            if (!text) {
+                showToast("Please enter an issue description");
+                return;
+            }
+
+            const priority = severityEl ? severityEl.value : 'Medium';
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            if (!phase.issues) phase.issues = [];
+
+            phase.issues.unshift({
+                id: "iss-" + Date.now(),
+                text: text,
+                priority: priority,
+                status: "Open",
+                createdAt: todayStr
+            });
+
+            if (inputEl) inputEl.value = '';
+            window.savePhaseToDb(phase);
+        };
+
+        window.toggleIssueStatus = function(phaseId, issueId) {
+            const phase = window.appState.phases.find(p => p.id === phaseId);
+            if (!phase || !phase.issues) return;
+
+            const issue = phase.issues.find(i => i.id === issueId);
+            if (!issue) return;
+
+            issue.status = issue.status === 'Open' ? 'Resolved' : 'Open';
+            window.savePhaseToDb(phase);
+        };
+
+        window.deleteIssueFromPhase = function(phaseId, issueId) {
+            openConfirmModal("Delete Issue Note", "Are you sure you want to remove this issue note from Firebase?", () => {
+                const phase = window.appState.phases.find(p => p.id === phaseId);
+                if (!phase || !phase.issues) return;
+
+                phase.issues = phase.issues.filter(i => i.id !== issueId);
+                window.savePhaseToDb(phase);
+            });
+        };
+
+        // MODAL MANAGEMENT
+        window.openAddPhaseModal = function() {
+            openPhaseModal(null);
+        };
+
+        window.openEditPhaseModal = function(phaseId) {
+            const phase = window.appState.phases.find(p => p.id === phaseId);
+            if (phase) {
+                openPhaseModal(phase);
+            }
+        };
+
+        function openPhaseModal(phase = null) {
+            const modal = document.getElementById('phase-modal');
+            const title = document.getElementById('modal-title');
+            const deleteBtn = document.getElementById('btn-delete-phase');
+
+            const todayStr = new Date().toISOString().split('T')[0];
+            const nextTwoWeeks = new Date();
+            nextTwoWeeks.setDate(nextTwoWeeks.getDate() + 14);
+            const estStr = nextTwoWeeks.toISOString().split('T')[0];
+
+            if (phase) {
+                title.textContent = "Edit Production Phase";
+                if (deleteBtn) deleteBtn.classList.remove('hidden');
+
+                document.getElementById('form-phase-id').value = phase.id;
+                document.getElementById('form-phase-name').value = phase.name || '';
+                document.getElementById('form-is-active').checked = !!phase.isActive;
+                
+                document.getElementById('form-target-qty').value = phase.targetQty || 50;
+                document.getElementById('form-est-date').value = phase.estDate || estStr;
+                
+                document.getElementById('form-built-qty').value = phase.builtQty || 0;
+                document.getElementById('form-built-date').value = phase.builtDate || todayStr;
+                
+                document.getElementById('form-qa-qty').value = phase.qaQty || 0;
+                document.getElementById('form-qa-date').value = phase.qaDate || todayStr;
+                
+                document.getElementById('form-approved-qty').value = phase.approvedQty || 0;
+                document.getElementById('form-approved-date').value = phase.approvedDate || todayStr;
+                
+                document.getElementById('form-notes').value = phase.notes || '';
+            } else {
+                title.textContent = "Add Production Phase";
+                if (deleteBtn) deleteBtn.classList.add('hidden');
+
+                const newId = "phase-" + Date.now();
+                const isFirst = window.appState.phases.length === 0;
+
+                document.getElementById('form-phase-id').value = newId;
+                document.getElementById('form-phase-name').value = `Phase ${window.appState.phases.length + 1}: Assembly Line Focus`;
+                document.getElementById('form-is-active').checked = isFirst;
+                
+                document.getElementById('form-target-qty').value = 50;
+                document.getElementById('form-est-date').value = estStr;
+                
+                document.getElementById('form-built-qty').value = 0;
+                document.getElementById('form-built-date').value = todayStr;
+                
+                document.getElementById('form-qa-qty').value = 0;
+                document.getElementById('form-qa-date').value = '';
+                
+                document.getElementById('form-approved-qty').value = 0;
+                document.getElementById('form-approved-date').value = '';
+                
+                document.getElementById('form-notes').value = '';
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        window.closePhaseModal = function() {
+            document.getElementById('phase-modal').classList.add('hidden');
+        };
+
+        window.savePhaseForm = function(e) {
+            e.preventDefault();
+
+            const phaseId = document.getElementById('form-phase-id').value;
+            const existing = window.appState.phases.find(p => p.id === phaseId) || {};
+
+            const phaseData = {
+                id: phaseId,
+                name: document.getElementById('form-phase-name').value,
+                isActive: document.getElementById('form-is-active').checked,
+                targetQty: Number(document.getElementById('form-target-qty').value) || 0,
+                estDate: document.getElementById('form-est-date').value,
+                builtQty: Number(document.getElementById('form-built-qty').value) || 0,
+                builtDate: document.getElementById('form-built-date').value,
+                qaQty: Number(document.getElementById('form-qa-qty').value) || 0,
+                qaDate: document.getElementById('form-qa-date').value,
+                approvedQty: Number(document.getElementById('form-approved-qty').value) || 0,
+                approvedDate: document.getElementById('form-approved-date').value,
+                notes: document.getElementById('form-notes').value,
+                issues: existing.issues || []
+            };
+
+            window.savePhaseToDb(phaseData);
+            closePhaseModal();
+        };
+
+        window.promptDeletePhaseFromModal = function() {
+            const phaseId = document.getElementById('form-phase-id').value;
+            if (phaseId) {
+                confirmDeletePhase(phaseId);
+                closePhaseModal();
+            }
+        };
+
+        window.confirmDeletePhase = function(phaseId) {
+            openConfirmModal("Delete Production Phase", "Are you sure you want to permanently remove this phase from Firebase Firestore?", () => {
+                window.deletePhaseFromDb(phaseId);
+            });
+        };
+
+        // CUSTOM CONFIRM MODAL (replaces window.confirm)
+        function openConfirmModal(title, msg, onConfirm) {
+            document.getElementById('confirm-modal-title').textContent = title;
+            document.getElementById('confirm-modal-msg').textContent = msg;
+            window.appState.pendingConfirmCallback = onConfirm;
+            document.getElementById('confirm-modal').classList.remove('hidden');
+        }
+
+        window.closeConfirmModal = function(isConfirmed) {
+            document.getElementById('confirm-modal').classList.add('hidden');
+            if (isConfirmed && typeof window.appState.pendingConfirmCallback === 'function') {
+                window.appState.pendingConfirmCallback();
+            }
+            window.appState.pendingConfirmCallback = null;
+        };
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+
+            if (!toast) return;
+
+            toastMsg.textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
