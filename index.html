@@ -8,10 +8,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Fonts -->
+    <!-- Google Fonts (Inter) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -43,8 +43,8 @@
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
         }
         .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
             background: #F1F5F9;
@@ -55,40 +55,39 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col selection:bg-lowes-yellow selection:text-lowes-navy">
 
-    <!-- Top Bar Navigation Header -->
     <header class="bg-lowes-navy text-white shadow-md border-b-4 border-lowes-yellow sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <!-- Brand & Title -->
+            <!-- Brand Logo & App Title -->
             <div class="flex items-center space-x-3">
                 <div class="bg-white p-1 rounded-md shadow-sm flex items-center justify-center">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTieAHsEFqZAlDOTFpxXIGzjHQmNKsaHFmznahGo4Reiw&s" 
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTieAHsEFqZAlDOTFpxXIGzjHQmNKsaHFmznahGo4Reiw&s=10" 
                          alt="Lowe's Logo" 
                          class="h-7 w-auto object-contain"
                          onerror="this.src='https://placehold.co/100x40/002244/ffffff?text=LOWES'">
                 </div>
                 <div>
-                    <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-white flex items-center gap-2">
+                    <h1 class="text-sm sm:text-lg font-extrabold tracking-tight text-white flex items-center gap-2">
                         LOWE'S PRODUCTION PLAN TRACKER
                     </h1>
                 </div>
             </div>
 
-            <!-- Header Actions & Status -->
-            <div class="flex items-center space-x-4">
-                <!-- Live Firebase Connection Indicator -->
-                <div class="flex items-center space-x-2 bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700 text-xs font-medium">
+            <!-- Header Connection Badge & Primary CTA -->
+            <div class="flex items-center space-x-3 sm:space-x-4">
+                <!-- Live Firebase Connection Status Indicator -->
+                <div id="status-container" class="flex items-center space-x-2 bg-slate-800/90 px-3 py-1.5 rounded-full border border-slate-700 text-xs font-medium">
                     <span class="relative flex h-2.5 w-2.5">
                         <span id="status-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span id="status-dot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                     </span>
-                    <span id="status-text" class="text-slate-200">Live Firebase Sync</span>
+                    <span id="status-text" class="text-slate-200 hidden sm:inline">Connecting...</span>
                 </div>
 
-                <!-- Add New Phase Action Button -->
+                <!-- Add New Phase Button -->
                 <button onclick="openAddPhaseModal()" 
-                        class="bg-lowes-yellow hover:bg-yellow-400 text-lowes-navy font-bold px-4 py-2 rounded-lg text-sm flex items-center gap-1.5 transition-all shadow-sm active:scale-95">
+                        class="bg-lowes-yellow hover:bg-yellow-400 text-lowes-navy font-black px-3.5 py-2 rounded-lg text-xs sm:text-sm flex items-center gap-1.5 transition-all shadow-sm active:scale-95">
                     <i data-lucide="plus" class="w-4 h-4 stroke-[3]"></i>
                     <span>New Phase</span>
                 </button>
@@ -96,23 +95,21 @@
         </div>
     </header>
 
-    <!-- Main Workspace Container -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-        <!-- Top Summary Stats Header (Restored 6 Cards Exactly) -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3.5">
+        <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
             
             <!-- 1. TARGET CARD -->
             <div class="bg-white rounded-xl p-3.5 border border-slate-200 card-shadow flex flex-col justify-between relative overflow-hidden">
                 <div class="flex items-center justify-between mb-1">
-                    <span class="text-xs font-bold text-slate-500 tracking-wider">1. TARGET</span>
+                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">1. TARGET</span>
                     <div class="p-1 rounded-full text-blue-600 bg-blue-50">
                         <i data-lucide="target" class="w-4 h-4"></i>
                     </div>
                 </div>
                 <div class="flex items-baseline justify-between my-1">
                     <span id="stat-target" class="text-2xl font-black text-slate-800">0</span>
-                    <span class="text-xs font-medium text-slate-400">Units</span>
+                    <span class="text-xs font-medium text-slate-400">Lockers</span>
                 </div>
                 <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mt-1">
                     <div class="bg-blue-600 h-full w-full rounded-full"></div>
@@ -122,7 +119,7 @@
             <!-- 2. BUILT MFG CARD -->
             <div class="bg-white rounded-xl p-3.5 border border-slate-200 card-shadow flex flex-col justify-between relative overflow-hidden">
                 <div class="flex items-center justify-between mb-1">
-                    <span class="text-xs font-bold text-slate-500 tracking-wider">2. BUILT MFG</span>
+                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">2. BUILT MFG</span>
                     <div class="p-1 rounded-full text-emerald-600 bg-emerald-50">
                         <i data-lucide="wrench" class="w-4 h-4"></i>
                     </div>
@@ -132,14 +129,14 @@
                     <span id="stat-built-pct" class="text-xs font-bold text-emerald-600">0%</span>
                 </div>
                 <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mt-1">
-                    <div id="stat-built-bar" class="bg-slate-200 h-full w-0 transition-all duration-300"></div>
+                    <div id="stat-built-bar" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div>
                 </div>
             </div>
 
             <!-- 3. TRANSFERRED CARD -->
             <div class="bg-white rounded-xl p-3.5 border border-slate-200 card-shadow flex flex-col justify-between relative overflow-hidden">
                 <div class="flex items-center justify-between mb-1">
-                    <span class="text-xs font-bold text-slate-500 tracking-wider">3. TRANSFERRED</span>
+                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">3. TRANSFERRED</span>
                     <div class="p-1 rounded-full text-purple-600 bg-purple-50">
                         <i data-lucide="truck" class="w-4 h-4"></i>
                     </div>
@@ -149,14 +146,14 @@
                     <span id="stat-transferred-pct" class="text-xs font-bold text-purple-600">0%</span>
                 </div>
                 <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mt-1">
-                    <div id="stat-transferred-bar" class="bg-slate-200 h-full w-0 transition-all duration-300"></div>
+                    <div id="stat-transferred-bar" class="bg-purple-500 h-full w-0 transition-all duration-300"></div>
                 </div>
             </div>
 
             <!-- 4. APPROVED CARD -->
             <div class="bg-white rounded-xl p-3.5 border border-slate-200 card-shadow flex flex-col justify-between relative overflow-hidden">
                 <div class="flex items-center justify-between mb-1">
-                    <span class="text-xs font-bold text-slate-500 tracking-wider">4. APPROVED</span>
+                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">4. APPROVED</span>
                     <div class="p-1 rounded-full text-indigo-600 bg-indigo-50">
                         <i data-lucide="check-circle-2" class="w-4 h-4"></i>
                     </div>
@@ -166,14 +163,14 @@
                     <span id="stat-approved-pct" class="text-xs font-bold text-indigo-600">0%</span>
                 </div>
                 <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mt-1">
-                    <div id="stat-approved-bar" class="bg-slate-200 h-full w-0 transition-all duration-300"></div>
+                    <div id="stat-approved-bar" class="bg-indigo-600 h-full w-0 transition-all duration-300"></div>
                 </div>
             </div>
 
             <!-- 5. OPEN ISSUES CARD -->
             <div class="bg-rose-50/40 rounded-xl p-3.5 border border-rose-200 card-shadow flex flex-col justify-between relative overflow-hidden">
                 <div class="flex items-center justify-between mb-1">
-                    <span class="text-xs font-bold text-rose-700 tracking-wider">5. OPEN ISSUES</span>
+                    <span class="text-[11px] font-bold text-rose-700 uppercase tracking-wider">5. OPEN ISSUES</span>
                     <div class="p-1 rounded-full text-rose-600 bg-rose-100">
                         <i data-lucide="alert-triangle" class="w-4 h-4"></i>
                     </div>
@@ -183,14 +180,14 @@
                     <span id="stat-high-issues" class="text-xs font-semibold px-2 py-0.5 bg-rose-100 text-rose-700 rounded-full border border-rose-200">0 High</span>
                 </div>
                 <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mt-1">
-                    <div id="stat-issues-bar" class="bg-slate-200 h-full w-0"></div>
+                    <div id="stat-issues-bar" class="bg-rose-500 h-full w-0 transition-all duration-300"></div>
                 </div>
             </div>
 
             <!-- 6. ACTIVE FOCUS CARD -->
             <div class="bg-white rounded-xl p-3.5 border border-slate-200 card-shadow flex flex-col justify-between relative overflow-hidden">
                 <div class="flex items-center justify-between mb-1">
-                    <span class="text-xs font-bold text-slate-500 tracking-wider">6. ACTIVE FOCUS</span>
+                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">6. ACTIVE FOCUS</span>
                     <div class="p-1 rounded-full text-amber-500 bg-amber-50">
                         <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
                     </div>
@@ -206,180 +203,201 @@
 
         </section>
 
-        <!-- Active Focus Phase Detailed View -->
-        <section id="active-phase-section" class="bg-white rounded-2xl border border-slate-200 p-5 card-shadow space-y-5">
-            <!-- Header for Active Focus -->
+        <section id="active-phase-section" class="bg-white rounded-2xl border border-slate-200 p-5 card-shadow space-y-6">
+            <!-- Active Focus Section Header -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                 <div class="flex items-center space-x-3">
-                    <div class="p-2 bg-lowes-navy text-lowes-yellow rounded-lg shadow-sm">
-                        <i data-lucide="layers" class="w-5 h-5"></i>
+                    <div class="p-2.5 bg-lowes-navy text-lowes-yellow rounded-xl shadow-sm">
+                        <i data-lucide="layers" class="w-6 h-6"></i>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="text-xs font-bold uppercase tracking-wider text-lowes-blue bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Active Phase Focus</span>
-                            <span id="active-phase-status-badge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">In Production</span>
+                            <span class="text-[10px] font-black uppercase tracking-wider text-lowes-blue bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Active Phase Focus</span>
+                            <span id="active-phase-status-badge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">In Production</span>
                         </div>
-                        <h2 id="active-phase-title" class="text-xl font-black text-slate-800 tracking-tight mt-0.5">Select a Phase</h2>
+                        <h2 id="active-phase-title" class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-0.5">Select a Phase</h2>
                     </div>
                 </div>
 
                 <!-- Phase Switcher Dropdown -->
                 <div class="flex items-center space-x-2">
-                    <label for="phase-select" class="text-xs font-bold text-slate-500 whitespace-nowrap">Switch Phase:</label>
-                    <select id="phase-select" onchange="switchActivePhase(this.value)" class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-lg focus:ring-lowes-blue focus:border-lowes-blue block p-2 font-medium">
+                    <label for="phase-select" class="text-xs font-bold text-slate-600 whitespace-nowrap">Switch Phase:</label>
+                    <select id="phase-select" onchange="switchActivePhase(this.value)" class="bg-slate-50 border border-slate-300 text-slate-800 text-xs sm:text-sm rounded-lg focus:ring-2 focus:ring-lowes-blue block p-2 font-semibold outline-none">
                         <option value="">-- Select Active Phase --</option>
                     </select>
                 </div>
             </div>
 
-            <!-- Big Pipeline Cards View (4 Stages) -->
+            <!-- Big Boxes Layout: 4 Pipeline Cards (Cards A, B, C, D) -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 
                 <!-- CARD A: TARGET LOCKERS -->
-                <div class="bg-slate-50/70 rounded-xl p-4 border border-slate-200 flex flex-col justify-between space-y-4 hover:border-blue-300 transition-colors">
+                <div class="bg-slate-50/80 rounded-xl p-4 border border-slate-200 flex flex-col justify-between space-y-4 hover:border-blue-300 transition-all">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-slate-600 uppercase tracking-wide">Target Lockers</span>
+                        <span class="text-xs font-bold text-slate-600 uppercase tracking-wide">Card A: Target Lockers</span>
                         <span class="p-1.5 bg-blue-100 text-blue-700 rounded-lg"><i data-lucide="box" class="w-4 h-4"></i></span>
                     </div>
                     <div>
                         <div class="text-3xl font-black text-slate-900" id="active-card-target">0</div>
-                        <div class="text-xs text-slate-500 font-medium mt-1 flex items-center justify-between">
-                            <span>Est Date:</span>
-                            <span id="active-card-date" class="font-semibold text-slate-700">TBD</span>
+                        <div class="text-xs text-slate-500 font-medium mt-1 flex justify-between">
+                            <span>Est Build Date:</span>
+                            <span id="active-card-est-date" class="font-bold text-slate-700">TBD</span>
                         </div>
                     </div>
-                    <div class="pt-3 border-t border-slate-200/80 text-xs text-slate-600 flex justify-between items-center">
-                        <span>Pending Completion:</span>
-                        <span id="active-card-pending-target" class="font-bold text-slate-800">0 Units</span>
+                    <div class="pt-3 border-t border-slate-200 text-xs text-slate-600 flex justify-between items-center">
+                        <span class="font-semibold text-slate-500">Pending Target:</span>
+                        <span id="active-card-pending-target" class="font-black text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">0 Units</span>
                     </div>
                 </div>
 
                 <!-- CARD B: BUILT MFG -->
-                <div class="bg-emerald-50/30 rounded-xl p-4 border border-emerald-200 flex flex-col justify-between space-y-4 hover:border-emerald-300 transition-colors">
+                <div class="bg-emerald-50/40 rounded-xl p-4 border border-emerald-200 flex flex-col justify-between space-y-4 hover:border-emerald-300 transition-all">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-emerald-800 uppercase tracking-wide">Built MFG</span>
-                        <span class="p-1.5 bg-emerald-100 text-emerald-700 rounded-lg"><i data-lucide="hammer" class="w-4 h-4"></i></span>
+                        <span class="text-xs font-bold text-emerald-800 uppercase tracking-wide">Card B: Built MFG</span>
+                        <span class="p-1.5 bg-emerald-100 text-emerald-700 rounded-lg"><i data-lucide="wrench" class="w-4 h-4"></i></span>
                     </div>
                     <div>
-                        <div class="text-3xl font-black text-emerald-900" id="active-card-built">0</div>
-                        <div class="text-xs text-emerald-700 font-medium mt-1 flex items-center justify-between">
-                            <span>Build Progress:</span>
-                            <span id="active-card-built-pct" class="font-bold text-emerald-800">0%</span>
+                        <div class="text-3xl font-black text-emerald-950" id="active-card-built">0</div>
+                        <div class="text-xs text-emerald-700 font-medium mt-1 flex justify-between">
+                            <span>Actual Build Date:</span>
+                            <span id="active-card-actual-date" class="font-bold text-emerald-900">TBD</span>
                         </div>
                     </div>
-                    <!-- Controls & Actions -->
-                    <div class="space-y-2 pt-2 border-t border-emerald-100">
+                    <!-- Controls & Stats -->
+                    <div class="space-y-2 pt-2 border-t border-emerald-200/80">
+                        <div class="flex justify-between items-center text-xs text-emerald-800 mb-1">
+                            <span class="font-medium">Pending Build:</span>
+                            <span id="active-card-pending-build" class="font-black bg-emerald-100 px-2 py-0.5 rounded">0 Units</span>
+                        </div>
                         <div class="grid grid-cols-2 gap-1.5">
-                            <button onclick="quickIncrementBuilt(1)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-2 rounded text-xs flex items-center justify-center gap-1 shadow-xs transition-all active:scale-95">
+                            <button onclick="quickIncrementBuilt(1)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-2 rounded-lg text-xs flex items-center justify-center gap-1 shadow-xs transition-all active:scale-95">
                                 <i data-lucide="plus" class="w-3.5 h-3.5"></i> +1 Built
                             </button>
-                            <button onclick="quickIncrementBuilt(5)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-2 rounded text-xs flex items-center justify-center gap-1 shadow-xs transition-all active:scale-95">
+                            <button onclick="quickIncrementBuilt(5)" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-1.5 px-2 rounded-lg text-xs flex items-center justify-center gap-1 shadow-xs transition-all active:scale-95">
                                 <i data-lucide="plus" class="w-3.5 h-3.5"></i> +5 Built
                             </button>
                         </div>
-                        <button onclick="openTransferModal('built_to_qa')" class="w-full bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-300 font-semibold py-1.5 px-3 rounded text-xs flex items-center justify-center gap-1.5 shadow-xs transition-colors">
-                            <span>Transfer to QA</span>
-                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                        </button>
                     </div>
                 </div>
 
                 <!-- CARD C: TRANSFERRED QA -->
-                <div class="bg-purple-50/30 rounded-xl p-4 border border-purple-200 flex flex-col justify-between space-y-4 hover:border-purple-300 transition-colors">
+                <div class="bg-purple-50/40 rounded-xl p-4 border border-purple-200 flex flex-col justify-between space-y-4 hover:border-purple-300 transition-all">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-purple-800 uppercase tracking-wide">Transferred QA</span>
-                        <span class="p-1.5 bg-purple-100 text-purple-700 rounded-lg"><i data-lucide="package-check" class="w-4 h-4"></i></span>
+                        <span class="text-xs font-bold text-purple-800 uppercase tracking-wide">Card C: Transferred QA</span>
+                        <span class="p-1.5 bg-purple-100 text-purple-700 rounded-lg"><i data-lucide="truck" class="w-4 h-4"></i></span>
                     </div>
                     <div>
-                        <div class="text-3xl font-black text-purple-900" id="active-card-transferred">0</div>
-                        <div class="text-xs text-purple-700 font-medium mt-1 flex items-center justify-between">
-                            <span>In QA Review:</span>
-                            <span id="active-card-transferred-pct" class="font-bold text-purple-800">0%</span>
+                        <div class="text-3xl font-black text-purple-950" id="active-card-transferred">0</div>
+                        <div class="text-xs text-purple-700 font-medium mt-1 flex justify-between">
+                            <span>QA Transfer Date:</span>
+                            <span id="active-card-qa-date" class="font-bold text-purple-900">TBD</span>
                         </div>
                     </div>
                     <!-- Controls & Actions -->
-                    <div class="space-y-2 pt-2 border-t border-purple-100">
-                        <button onclick="openTransferModal('qa_to_approved')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all active:scale-95">
-                            <span>Approve QA Units</span>
-                            <i data-lucide="check" class="w-3.5 h-3.5"></i>
-                        </button>
-                        <div class="text-[11px] text-purple-600 text-center font-medium">
-                            Ready for QA Approval
+                    <div class="space-y-2 pt-2 border-t border-purple-200/80">
+                        <div class="flex justify-between items-center text-xs text-purple-800 mb-1">
+                            <span class="font-medium">Pending QA Transfer:</span>
+                            <span id="active-card-pending-transfer" class="font-black bg-purple-100 px-2 py-0.5 rounded">0 Units</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-1.5">
+                            <button onclick="transferAllBuilt()" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-1.5 px-2 rounded-lg text-xs flex items-center justify-center gap-1 shadow-xs transition-all active:scale-95" title="Transfer all built MFG to QA">
+                                <span>Transfer All</span>
+                            </button>
+                            <button onclick="openTransferModal('built_to_qa')" class="bg-white hover:bg-purple-50 text-purple-700 border border-purple-300 font-bold py-1.5 px-2 rounded-lg text-xs flex items-center justify-center gap-1 shadow-xs transition-all active:scale-95">
+                                <span>Custom...</span>
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- CARD D: QA APPROVED -->
-                <div class="bg-indigo-50/30 rounded-xl p-4 border border-indigo-200 flex flex-col justify-between space-y-4 hover:border-indigo-300 transition-colors">
+                <div class="bg-indigo-50/40 rounded-xl p-4 border border-indigo-200 flex flex-col justify-between space-y-4 hover:border-indigo-300 transition-all">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-indigo-800 uppercase tracking-wide">QA Approved</span>
+                        <span class="text-xs font-bold text-indigo-800 uppercase tracking-wide">Card D: QA Approved</span>
                         <span class="p-1.5 bg-indigo-100 text-indigo-700 rounded-lg"><i data-lucide="award" class="w-4 h-4"></i></span>
                     </div>
                     <div>
-                        <div class="text-3xl font-black text-indigo-900" id="active-card-approved">0</div>
-                        <div class="text-xs text-indigo-700 font-medium mt-1 flex items-center justify-between">
-                            <span>Final Approval:</span>
-                            <span id="active-card-approved-pct" class="font-bold text-indigo-800">0%</span>
+                        <div class="text-3xl font-black text-indigo-950" id="active-card-approved">0</div>
+                        <div class="text-xs text-indigo-700 font-medium mt-1 flex justify-between">
+                            <span>Approval Date:</span>
+                            <span id="active-card-approval-date" class="font-bold text-indigo-900">TBD</span>
                         </div>
                     </div>
-                    <div class="pt-3 border-t border-indigo-100 space-y-2">
-                        <div class="w-full bg-indigo-100 h-2 rounded-full overflow-hidden">
-                            <div id="active-card-approved-progress" class="bg-indigo-600 h-full w-0 transition-all"></div>
+                    <!-- Controls & Actions -->
+                    <div class="space-y-2 pt-2 border-t border-indigo-200/80">
+                        <div class="flex justify-between items-center text-xs text-indigo-800 mb-1">
+                            <span class="font-medium">Pending Approval:</span>
+                            <span id="active-card-pending-approval" class="font-black bg-indigo-100 px-2 py-0.5 rounded">0 Units</span>
                         </div>
-                        <div class="text-[11px] text-indigo-700 font-semibold text-right">
-                            <span id="active-card-completion-rate">0% Completed</span>
+                        <div class="grid grid-cols-2 gap-1.5">
+                            <button onclick="approveAllTransferred()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1.5 px-2 rounded-lg text-xs flex items-center justify-center gap-1 shadow-xs transition-all active:scale-95" title="Approve all transferred QA units">
+                                <span>Approve All</span>
+                            </button>
+                            <button onclick="openTransferModal('qa_to_approved')" class="bg-white hover:bg-indigo-50 text-indigo-700 border border-indigo-300 font-bold py-1.5 px-2 rounded-lg text-xs flex items-center justify-center gap-1 shadow-xs transition-all active:scale-95">
+                                <span>Custom...</span>
+                            </button>
                         </div>
                     </div>
                 </div>
 
             </div>
 
-            <!-- Blockers & Issues Management Section for Active Phase -->
             <div class="mt-6 border-t border-slate-100 pt-5">
                 <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center space-x-2">
-                        <i data-lucide="alert-circle" class="w-4 h-4 text-rose-600"></i>
-                        <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide">Phase Issue Notes & Blockers</h3>
+                        <i data-lucide="alert-circle" class="w-4.5 h-4.5 text-rose-600"></i>
+                        <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide">Phase Blocker & Issue Notes</h3>
                         <span id="active-phase-blocker-count" class="bg-rose-100 text-rose-800 text-xs font-bold px-2 py-0.5 rounded-full">0 Open</span>
                     </div>
-                    <button onclick="openAddIssueModal()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-colors">
-                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                        <span>Add Issue / Blocker</span>
-                    </button>
                 </div>
 
+                <!-- Add New Issue Form inline -->
+                <form onsubmit="handleInlineIssueSubmit(event)" class="flex flex-col sm:flex-row gap-2 mb-4 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <input type="text" id="inline-issue-title" required placeholder="Describe blocker issue (e.g. Missing component hardware)..." 
+                           class="flex-1 text-xs p-2 bg-white border border-slate-300 rounded-lg focus:ring-2 focus:ring-lowes-blue outline-none">
+                    
+                    <select id="inline-issue-severity" class="text-xs p-2 bg-white border border-slate-300 rounded-lg font-semibold outline-none">
+                        <option value="High">High Severity</option>
+                        <option value="Normal" selected>Normal Severity</option>
+                        <option value="Low">Low Severity</option>
+                    </select>
+
+                    <button type="submit" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-4 py-2 rounded-lg text-xs flex items-center justify-center gap-1.5 transition-colors">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>Add Issue</span>
+                    </button>
+                </form>
+
                 <!-- Blocker List Container -->
-                <div id="active-phase-issues-container" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-1">
-                    <div class="text-xs text-slate-400 italic py-3 text-center bg-slate-50 rounded-lg border border-dashed border-slate-200">
+                <div id="active-phase-issues-container" class="space-y-2 max-h-52 overflow-y-auto custom-scrollbar pr-1">
+                    <div class="text-xs text-slate-400 italic py-4 text-center bg-slate-50 rounded-lg border border-dashed border-slate-200">
                         No active blockers reported for this phase.
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Compact Table for All / Remaining Phases -->
         <section class="bg-white rounded-2xl border border-slate-200 card-shadow overflow-hidden">
             <!-- Table Header Bar -->
-            <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50">
+            <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/60">
                 <div>
                     <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
                         <i data-lucide="list-tree" class="w-4 h-4 text-lowes-blue"></i>
-                        <span>All Production Phases Overview</span>
+                        <span>All Production Phases Matrix</span>
                     </h3>
-                    <p class="text-xs text-slate-500 mt-0.5">Compact status matrix across all target phases</p>
+                    <p class="text-xs text-slate-500 mt-0.5">Compact summary table of targets, manufacturing status, and blockers</p>
                 </div>
-                <div class="text-xs text-slate-500 font-medium bg-white px-3 py-1.5 rounded-md border border-slate-200 shadow-2xs">
-                    Total Phases: <span id="table-total-count" class="font-bold text-slate-800">0</span>
+                <div class="text-xs text-slate-600 font-medium bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
+                    Total Phases: <span id="table-total-count" class="font-bold text-slate-900">0</span>
                 </div>
             </div>
 
-            <!-- Scrollable Table -->
+            <!-- Scrollable Compact Table -->
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-slate-100/80 text-slate-600 text-[11px] font-bold uppercase tracking-wider border-b border-slate-200">
+                        <tr class="bg-slate-100/90 text-slate-600 text-[11px] font-bold uppercase tracking-wider border-b border-slate-200">
                             <th class="py-2 px-3">Phase Name</th>
-                            <th class="py-2 px-3">Status</th>
                             <th class="py-2 px-3 text-right">Target</th>
                             <th class="py-2 px-3 text-right">Built MFG</th>
                             <th class="py-2 px-3 text-right">Transferred QA</th>
@@ -390,9 +408,8 @@
                         </tr>
                     </thead>
                     <tbody id="phases-table-body" class="divide-y divide-slate-100 text-xs">
-                        <!-- Dynamic Phase Rows Rendered Here -->
                         <tr>
-                            <td colspan="9" class="py-6 text-center text-slate-400 font-medium">
+                            <td colspan="8" class="py-6 text-center text-slate-400 font-medium">
                                 Loading production plan phases...
                             </td>
                         </tr>
@@ -402,11 +419,12 @@
         </section>
     </main>
 
+
     <!-- MODAL 1: ADD / EDIT PHASE MODAL -->
     <div id="phase-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 transform transition-all space-y-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 space-y-4 max-h-[90vh] overflow-y-auto custom-scrollbar">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 id="modal-title" class="text-lg font-bold text-slate-900">Add New Production Phase</h3>
+                <h3 id="modal-title" class="text-lg font-extrabold text-slate-900">Add New Production Phase</h3>
                 <button onclick="closePhaseModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
@@ -425,13 +443,13 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">Target Quantity *</label>
                         <input type="number" id="phase-target" min="1" required placeholder="e.g. 50" 
-                               class="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-lowes-blue outline-none">
+                               class="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-lowes-blue outline-none font-bold">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">Status</label>
-                        <select id="phase-status" class="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-lowes-blue outline-none font-medium">
+                        <select id="phase-status" class="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-lowes-blue outline-none font-semibold">
                             <option value="Planning">Planning</option>
-                            <option value="In Production">In Production</option>
+                            <option value="In Production" selected>In Production</option>
                             <option value="QA Testing">QA Testing</option>
                             <option value="Completed">Completed</option>
                             <option value="Blocked">Blocked</option>
@@ -439,38 +457,51 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-3 gap-2 pt-1">
+                <div class="grid grid-cols-3 gap-2 pt-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
                     <div>
-                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Built MFG</label>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Built MFG</label>
                         <input type="number" id="phase-built" min="0" value="0" 
-                               class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg outline-none">
+                               class="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg outline-none font-semibold">
                     </div>
                     <div>
-                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">Transferred QA</label>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Transferred QA</label>
                         <input type="number" id="phase-transferred" min="0" value="0" 
-                               class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg outline-none">
+                               class="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg outline-none font-semibold">
                     </div>
                     <div>
-                        <label class="block text-[11px] font-semibold text-slate-600 mb-1">QA Approved</label>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">QA Approved</label>
                         <input type="number" id="phase-approved" min="0" value="0" 
-                               class="w-full text-xs p-2 bg-slate-50 border border-slate-300 rounded-lg outline-none">
+                               class="w-full text-xs p-2 bg-white border border-slate-300 rounded-lg outline-none font-semibold">
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Estimated Date</label>
-                    <input type="date" id="phase-date" 
-                           class="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-lg outline-none">
+                <div class="grid grid-cols-2 gap-3 pt-1">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Est Build Date</label>
+                        <input type="date" id="phase-est-date" class="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-lg outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Actual Build Date</label>
+                        <input type="date" id="phase-actual-date" class="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-lg outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">QA Transfer Date</label>
+                        <input type="date" id="phase-qa-date" class="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-lg outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Approval Date</label>
+                        <input type="date" id="phase-approval-date" class="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-lg outline-none">
+                    </div>
                 </div>
 
-                <div class="flex items-center space-x-2 pt-1">
+                <div class="flex items-center space-x-2 pt-2">
                     <input type="checkbox" id="phase-active-check" class="rounded text-lowes-blue focus:ring-lowes-blue h-4 w-4">
-                    <label for="phase-active-check" class="text-xs font-medium text-slate-700">Set as Active Focus Phase</label>
+                    <label for="phase-active-check" class="text-xs font-bold text-slate-800">Set as Active Focus Phase</label>
                 </div>
 
                 <div class="flex justify-end space-x-2 pt-4 border-t border-slate-100">
                     <button type="button" onclick="closePhaseModal()" class="px-4 py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg">Cancel</button>
-                    <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-lowes-blue hover:bg-blue-800 rounded-lg shadow-sm">Save Phase</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-lowes-blue hover:bg-blue-900 rounded-lg shadow-sm">Save Phase</button>
                 </div>
             </form>
         </div>
@@ -480,7 +511,7 @@
     <div id="transfer-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 id="transfer-modal-title" class="text-base font-bold text-slate-900">Transfer Units</h3>
+                <h3 id="transfer-modal-title" class="text-base font-extrabold text-slate-900">Transfer Units</h3>
                 <button onclick="closeTransferModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
@@ -489,10 +520,10 @@
             <form id="transfer-form" onsubmit="handleTransferSubmit(event)" class="space-y-3">
                 <input type="hidden" id="transfer-type">
                 
-                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs space-y-1">
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
                     <div class="flex justify-between text-slate-600">
                         <span>Source Available:</span>
-                        <span id="transfer-source-qty" class="font-bold text-slate-900">0</span>
+                        <span id="transfer-source-qty" class="font-bold text-slate-900">0 Units</span>
                     </div>
                     <div class="text-[11px] text-slate-500 italic" id="transfer-description">
                         Moving units to next stage
@@ -502,52 +533,18 @@
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">Quantity to Transfer *</label>
                     <input type="number" id="transfer-qty" min="1" required value="1" 
-                           class="w-full text-sm font-bold p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-lowes-blue outline-none">
+                           class="w-full text-base font-bold p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-lowes-blue outline-none">
                 </div>
 
                 <div class="flex justify-end space-x-2 pt-3 border-t border-slate-100">
-                    <button type="button" onclick="closeTransferModal()" class="px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg">Cancel</button>
-                    <button type="submit" class="px-4 py-1.5 text-xs font-bold text-white bg-lowes-blue hover:bg-blue-800 rounded-lg shadow-sm">Confirm Transfer</button>
+                    <button type="button" onclick="closeTransferModal()" class="px-3 py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-bold text-white bg-lowes-blue hover:bg-blue-900 rounded-lg shadow-sm">Confirm Transfer</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL 3: ADD ISSUE / BLOCKER MODAL -->
-    <div id="issue-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 class="text-base font-bold text-slate-900">Add Phase Blocker / Issue</h3>
-                <button onclick="closeIssueModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-
-            <form id="issue-form" onsubmit="handleIssueSubmit(event)" class="space-y-3">
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Issue Title *</label>
-                    <input type="text" id="issue-title" required placeholder="e.g. Component supply delay" 
-                           class="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-lowes-blue outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Severity</label>
-                    <select id="issue-severity" class="w-full text-xs p-2.5 bg-slate-50 border border-slate-300 rounded-lg outline-none font-medium">
-                        <option value="High">High (Critical Blocker)</option>
-                        <option value="Normal">Normal</option>
-                        <option value="Low">Low</option>
-                    </select>
-                </div>
-
-                <div class="flex justify-end space-x-2 pt-3 border-t border-slate-100">
-                    <button type="button" onclick="closeIssueModal()" class="px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg">Cancel</button>
-                    <button type="submit" class="px-4 py-1.5 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-lg shadow-sm">Save Issue</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL 4: DELETE CONFIRMATION MODAL -->
+    <!-- MODAL 3: DELETE CONFIRMATION MODAL -->
     <div id="delete-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 space-y-4">
             <div class="text-center space-y-2">
@@ -564,13 +561,12 @@
         </div>
     </div>
 
-    <!-- Firebase Modular SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, onSnapshot, setDoc, addDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, onSnapshot, addDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Global state storage
+        // Global State Container
         window.appState = {
             phases: [],
             activePhaseId: null,
@@ -581,21 +577,28 @@
             appId: typeof __app_id !== 'undefined' ? __app_id : 'lowes-production-plan'
         };
 
-        // Firebase Configuration (Uses platform injection or fallback default)
+        // Firebase Configuration (Inject or fallback to provided user config)
         const firebaseConfig = typeof __firebase_config !== 'undefined' 
             ? JSON.parse(__firebase_config) 
-            : { projectId: "lowes-order" };
+            : {
+                apiKey: "AIzaSyDJp3vhQPejd52qWsSIwmn-kflCKm9ae_Q",
+                authDomain: "lowes-order.firebaseapp.com",
+                projectId: "lowes-order",
+                storageBucket: "lowes-order.firebasestorage.app",
+                messagingSenderId: "1054468592116",
+                appId: "1:1054468592116:web:149b6c09c5a4555c62a9a1",
+                measurementId: "G-T030V2KYGL"
+            };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         window.appState.db = db;
 
-        // Strict Path Requirement: /artifacts/{appId}/public/data/production_phases
+        // Strict Path Mandate Rule 1: /artifacts/{appId}/public/data/production_phases
         const phasesCollection = collection(db, 'artifacts', window.appState.appId, 'public', 'data', 'production_phases');
         window.appState.collectionRef = phasesCollection;
 
-        // Authenticate then subscribe to realtime Firestore updates
         async function initAuthAndData() {
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
@@ -604,8 +607,12 @@
                     await signInAnonymously(auth);
                 }
             } catch (err) {
-                console.warn("Auth fallback trigger:", err);
-                await signInAnonymously(auth);
+                console.warn("Auth initialization fallback:", err);
+                try {
+                    await signInAnonymously(auth);
+                } catch (e) {
+                    console.error("Anonymous auth failed:", e);
+                }
             }
         }
 
@@ -614,7 +621,7 @@
                 window.appState.currentUser = user;
                 updateStatusBadge(true, "Live Firebase Sync");
                 
-                // Realtime Listener with MANDATORY Error Callback
+                // Realtime Listener with MANDATORY Error Callback (Rule 3 Guarded)
                 onSnapshot(phasesCollection, (snapshot) => {
                     const loadedPhases = [];
                     snapshot.forEach((docSnap) => {
@@ -626,7 +633,7 @@
 
                     window.appState.phases = loadedPhases;
 
-                    // Ensure an active phase is assigned
+                    // Ensure an active phase focus is always selected
                     if (loadedPhases.length > 0) {
                         const activeObj = loadedPhases.find(p => p.isActive);
                         if (activeObj) {
@@ -640,7 +647,7 @@
 
                     renderUI();
                 }, (error) => {
-                    console.error("Firestore snapshot error:", error);
+                    console.error("Firestore subscription error:", error);
                     updateStatusBadge(false, "Sync Error");
                 });
             } else {
@@ -650,8 +657,6 @@
 
         initAuthAndData();
 
-
-        // Status Badge Helper
         function updateStatusBadge(isOnline, text) {
             const dot = document.getElementById('status-dot');
             const ping = document.getElementById('status-ping');
@@ -668,7 +673,6 @@
             }
         }
 
-        // Global UI Render Pipeline
         window.renderUI = function() {
             const phases = window.appState.phases;
 
@@ -718,12 +722,13 @@
 
             document.getElementById('stat-issues').textContent = totalOpenIssues;
             document.getElementById('stat-high-issues').textContent = `${totalHighIssues} High`;
-            
+            document.getElementById('stat-issues-bar').style.width = `${totalOpenIssues > 0 ? Math.min(100, totalOpenIssues * 20) : 0}%`;
+
             const activePhase = phases.find(p => p.id === window.appState.activePhaseId);
             document.getElementById('stat-active-name').textContent = activePhase ? activePhase.name : 'None Active';
             document.getElementById('stat-total-phases').textContent = `${phases.length} Phase${phases.length === 1 ? '' : 's'} Total`;
 
-            // 2. Render Active Phase Section
+            // 2. Render Active Phase Section Big Cards & Blockers
             renderActivePhaseDetails(activePhase);
 
             // 3. Render Phase Switcher Options
@@ -737,16 +742,15 @@
                 selectEl.appendChild(opt);
             });
 
-            // 4. Render Compact Phases Overview Table
+            // 4. Render Compact Phases Table
             renderPhasesTable(phases);
 
-            // Re-initialize Lucide Icons
+            // Refresh Lucide Icons
             if (window.lucide) {
                 window.lucide.createIcons();
             }
         };
 
-        // Render Active Phase View
         function renderActivePhaseDetails(phase) {
             if (!phase) {
                 document.getElementById('active-phase-title').textContent = "No Active Phase Selected";
@@ -756,7 +760,7 @@
                 document.getElementById('active-card-approved').textContent = "0";
                 document.getElementById('active-phase-issues-container').innerHTML = `
                     <div class="text-xs text-slate-400 italic py-4 text-center bg-slate-50 rounded-lg">
-                        Select or create a production phase to view active pipeline details.
+                        Select or create a production phase to view pipeline details.
                     </div>`;
                 return;
             }
@@ -769,26 +773,31 @@
             const transferred = Number(phase.transferred || 0);
             const approved = Number(phase.approved || 0);
 
-            // Pipeline calculations
-            const pendingCompletion = Math.max(0, target - approved);
-            const builtRatio = target > 0 ? Math.min(100, Math.round(((built + transferred + approved) / target) * 100)) : 0;
-            const transferredRatio = target > 0 ? Math.min(100, Math.round(((transferred + approved) / target) * 100)) : 0;
-            const approvedRatio = target > 0 ? Math.min(100, Math.round((approved / target) * 100)) : 0;
+            // Calculate metrics based on pipeline logic requirements
+            const pendingTarget = Math.max(0, target - approved);
+            const pendingBuild = Math.max(0, target - (built + transferred + approved));
+            const pendingTransfer = built; // Built lockers waiting for QA transfer
+            const pendingApproval = transferred; // Transferred QA units waiting for approval
 
+            // Update Card A: TARGET
             document.getElementById('active-card-target').textContent = target.toLocaleString();
-            document.getElementById('active-card-date').textContent = phase.estDate || 'N/A';
-            document.getElementById('active-card-pending-target').textContent = `${pendingCompletion.toLocaleString()} Units`;
+            document.getElementById('active-card-est-date').textContent = phase.estDate || 'TBD';
+            document.getElementById('active-card-pending-target').textContent = `${pendingTarget.toLocaleString()} Units`;
 
+            // Update Card B: BUILT MFG
             document.getElementById('active-card-built').textContent = built.toLocaleString();
-            document.getElementById('active-card-built-pct').textContent = `${builtRatio}%`;
+            document.getElementById('active-card-actual-date').textContent = phase.actualDate || 'TBD';
+            document.getElementById('active-card-pending-build').textContent = `${pendingBuild.toLocaleString()} Units`;
 
+            // Update Card C: TRANSFERRED QA
             document.getElementById('active-card-transferred').textContent = transferred.toLocaleString();
-            document.getElementById('active-card-transferred-pct').textContent = `${transferredRatio}%`;
+            document.getElementById('active-card-qa-date').textContent = phase.qaDate || 'TBD';
+            document.getElementById('active-card-pending-transfer').textContent = `${pendingTransfer.toLocaleString()} Units`;
 
+            // Update Card D: QA APPROVED
             document.getElementById('active-card-approved').textContent = approved.toLocaleString();
-            document.getElementById('active-card-approved-pct').textContent = `${approvedRatio}%`;
-            document.getElementById('active-card-approved-progress').style.width = `${approvedRatio}%`;
-            document.getElementById('active-card-completion-rate').textContent = `${approvedRatio}% Target Reached`;
+            document.getElementById('active-card-approval-date').textContent = phase.approvalDate || 'TBD';
+            document.getElementById('active-card-pending-approval').textContent = `${pendingApproval.toLocaleString()} Units`;
 
             // Render Issues / Blockers for Active Phase
             const issuesContainer = document.getElementById('active-phase-issues-container');
@@ -807,20 +816,24 @@
                         <div class="flex items-center space-x-2">
                             <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
                                 iss.severity === 'High' ? 'bg-rose-600 text-white' : 'bg-slate-200 text-slate-700'
-                            }">${iss.severity}</span>
+                            }">${iss.severity || 'Normal'}</span>
                             <span class="font-medium text-slate-800 ${iss.status === 'Resolved' ? 'line-through text-slate-400' : ''}">${iss.title}</span>
                         </div>
-                        <button onclick="toggleIssueStatus('${phase.id}', ${index})" class="text-[11px] font-semibold px-2 py-1 rounded ${
-                            iss.status === 'Resolved' ? 'bg-slate-200 text-slate-700' : 'bg-emerald-100 hover:bg-emerald-200 text-emerald-800'
-                        }">
-                            ${iss.status === 'Resolved' ? 'Reopen' : 'Mark Resolved'}
-                        </button>
+                        <div class="flex items-center space-x-1.5">
+                            <button onclick="toggleIssueStatus('${phase.id}', ${index})" class="text-[11px] font-semibold px-2 py-1 rounded ${
+                                iss.status === 'Resolved' ? 'bg-slate-200 text-slate-700' : 'bg-emerald-100 hover:bg-emerald-200 text-emerald-800'
+                            }">
+                                ${iss.status === 'Resolved' ? 'Reopen' : 'Mark Resolved'}
+                            </button>
+                            <button onclick="deleteIssue('${phase.id}', ${index})" title="Delete issue" class="p-1 text-slate-400 hover:text-rose-600 rounded">
+                                <i data-lucide="trash" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
                     </div>
                 `).join('');
             }
         }
 
-        // Render Compact Table Across All Phases
         function renderPhasesTable(phases) {
             const tbody = document.getElementById('phases-table-body');
             document.getElementById('table-total-count').textContent = phases.length;
@@ -828,7 +841,7 @@
             if (phases.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="9" class="py-8 text-center text-slate-400 font-medium">
+                        <td colspan="8" class="py-8 text-center text-slate-400 font-medium">
                             No production phases found. Click <strong>"+ New Phase"</strong> above to create one.
                         </td>
                     </tr>`;
@@ -844,283 +857,4 @@
 
                 const issues = p.issues || [];
                 const openBlockers = issues.filter(i => i.status === 'Open').length;
-                const isActive = p.id === window.appState.activePhaseId;
-
-                return `
-                    <tr class="hover:bg-slate-50/80 transition-colors ${isActive ? 'bg-amber-50/40 font-semibold' : ''}">
-                        <!-- Phase Name -->
-                        <td class="py-2 px-3 font-bold text-slate-900 flex items-center space-x-1.5">
-                            ${isActive ? '<i data-lucide="star" class="w-3.5 h-3.5 text-amber-500 fill-amber-400 shrink-0"></i>' : ''}
-                            <span class="truncate max-w-[180px]">${p.name}</span>
-                        </td>
-                        <!-- Status Badge -->
-                        <td class="py-2 px-3">
-                            <span class="px-2 py-0.5 text-[10px] font-bold rounded-full border ${getStatusBadgeClass(p.status)}">
-                                ${p.status || 'Planning'}
-                            </span>
-                        </td>
-                        <!-- Target -->
-                        <td class="py-2 px-3 text-right font-bold text-slate-800">${target.toLocaleString()}</td>
-                        <!-- Built MFG -->
-                        <td class="py-2 px-3 text-right text-emerald-700 font-semibold">${built.toLocaleString()}</td>
-                        <!-- Transferred QA -->
-                        <td class="py-2 px-3 text-right text-purple-700 font-semibold">${transferred.toLocaleString()}</td>
-                        <!-- QA Approved -->
-                        <td class="py-2 px-3 text-right text-indigo-700 font-semibold">${approved.toLocaleString()}</td>
-                        <!-- Pending -->
-                        <td class="py-2 px-3 text-right font-medium text-slate-500">${pending.toLocaleString()}</td>
-                        <!-- Blockers -->
-                        <td class="py-2 px-3 text-center">
-                            ${openBlockers > 0 
-                                ? `<span class="px-2 py-0.5 bg-rose-100 text-rose-800 font-bold rounded-full text-[10px]">${openBlockers} Open</span>`
-                                : `<span class="text-slate-400 text-[11px]">-</span>`
-                            }
-                        </td>
-                        <!-- Actions -->
-                        <td class="py-2 px-3 text-center">
-                            <div class="flex items-center justify-center space-x-1">
-                                <button onclick="switchActivePhase('${p.id}')" title="Set Active Focus" 
-                                        class="p-1 rounded hover:bg-amber-100 text-amber-600 transition-colors">
-                                    <i data-lucide="star" class="w-3.5 h-3.5 ${isActive ? 'fill-amber-400' : ''}"></i>
-                                </button>
-                                <button onclick="openEditPhaseModal('${p.id}')" title="Edit Phase" 
-                                        class="p-1 rounded hover:bg-blue-100 text-blue-600 transition-colors">
-                                    <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
-                                </button>
-                                <button onclick="openDeleteModal('${p.id}', '${p.name.replace(/'/g, "\\'")}')" title="Delete Phase" 
-                                        class="p-1 rounded hover:bg-rose-100 text-rose-600 transition-colors">
-                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function getStatusBadgeClass(status) {
-            switch (status) {
-                case 'Completed': return 'bg-emerald-100 text-emerald-800 border-emerald-200';
-                case 'In Production': return 'bg-blue-100 text-blue-800 border-blue-200';
-                case 'QA Testing': return 'bg-purple-100 text-purple-800 border-purple-200';
-                case 'Blocked': return 'bg-rose-100 text-rose-800 border-rose-200';
-                default: return 'bg-slate-100 text-slate-700 border-slate-200';
-            }
-        }
-
-        // Global Event Handlers
-        window.switchActivePhase = async function(phaseId) {
-            if (!phaseId) return;
-            window.appState.activePhaseId = phaseId;
-
-            // Update in Firestore
-            try {
-                const batch = window.appState.phases.map(p => {
-                    const ref = doc(db, 'artifacts', window.appState.appId, 'public', 'data', 'production_phases', p.id);
-                    return updateDoc(ref, { isActive: p.id === phaseId });
-                });
-                await Promise.all(batch);
-            } catch (err) {
-                console.error("Error setting active phase:", err);
-            }
-            renderUI();
-        };
-
-        window.quickIncrementBuilt = async function(amount) {
-            const activePhase = window.appState.phases.find(p => p.id === window.appState.activePhaseId);
-            if (!activePhase) return;
-
-            const newBuilt = Number(activePhase.built || 0) + amount;
-            const ref = doc(db, 'artifacts', window.appState.appId, 'public', 'data', 'production_phases', activePhase.id);
-            await updateDoc(ref, { built: newBuilt });
-        };
-
-        window.openAddPhaseModal = function() {
-            document.getElementById('modal-title').textContent = "Add New Production Phase";
-            document.getElementById('phase-id').value = "";
-            document.getElementById('phase-form').reset();
-            document.getElementById('phase-built').value = "0";
-            document.getElementById('phase-transferred').value = "0";
-            document.getElementById('phase-approved').value = "0";
-            document.getElementById('phase-modal').classList.remove('hidden');
-        };
-
-        window.openEditPhaseModal = function(phaseId) {
-            const phase = window.appState.phases.find(p => p.id === phaseId);
-            if (!phase) return;
-
-            document.getElementById('modal-title').textContent = "Edit Production Phase";
-            document.getElementById('phase-id').value = phase.id;
-            document.getElementById('phase-name').value = phase.name || '';
-            document.getElementById('phase-target').value = phase.target || 0;
-            document.getElementById('phase-status').value = phase.status || 'In Production';
-            document.getElementById('phase-built').value = phase.built || 0;
-            document.getElementById('phase-transferred').value = phase.transferred || 0;
-            document.getElementById('phase-approved').value = phase.approved || 0;
-            document.getElementById('phase-date').value = phase.estDate || '';
-            document.getElementById('phase-active-check').checked = !!phase.isActive;
-
-            document.getElementById('phase-modal').classList.remove('hidden');
-        };
-
-        window.closePhaseModal = function() {
-            document.getElementById('phase-modal').classList.add('hidden');
-        };
-
-        window.handlePhaseSubmit = async function(e) {
-            e.preventDefault();
-            const id = document.getElementById('phase-id').value;
-            const name = document.getElementById('phase-name').value.trim();
-            const target = Number(document.getElementById('phase-target').value);
-            const status = document.getElementById('phase-status').value;
-            const built = Number(document.getElementById('phase-built').value);
-            const transferred = Number(document.getElementById('phase-transferred').value);
-            const approved = Number(document.getElementById('phase-approved').value);
-            const estDate = document.getElementById('phase-date').value;
-            const isActive = document.getElementById('phase-active-check').checked;
-
-            const payload = { name, target, status, built, transferred, approved, estDate, isActive };
-
-            try {
-                if (id) {
-                    const ref = doc(db, 'artifacts', window.appState.appId, 'public', 'data', 'production_phases', id);
-                    await updateDoc(ref, payload);
-                } else {
-                    payload.issues = [];
-                    await addDoc(window.appState.collectionRef, payload);
-                }
-
-                if (isActive) {
-                    window.appState.activePhaseId = id;
-                }
-                closePhaseModal();
-            } catch (err) {
-                console.error("Error saving phase:", err);
-            }
-        };
-
-        // Custom Transfer Actions
-        window.openTransferModal = function(type) {
-            const activePhase = window.appState.phases.find(p => p.id === window.appState.activePhaseId);
-            if (!activePhase) return;
-
-            document.getElementById('transfer-type').value = type;
-            const modalTitle = document.getElementById('transfer-modal-title');
-            const sourceQtyLabel = document.getElementById('transfer-source-qty');
-            const descLabel = document.getElementById('transfer-description');
-
-            if (type === 'built_to_qa') {
-                modalTitle.textContent = "Transfer Built MFG → QA Transferred";
-                sourceQtyLabel.textContent = `${activePhase.built || 0} Units Built`;
-                descLabel.textContent = "Moves built lockers into QA Testing pool";
-                document.getElementById('transfer-qty').max = activePhase.built || 0;
-            } else {
-                modalTitle.textContent = "Approve QA Transferred → QA Approved";
-                sourceQtyLabel.textContent = `${activePhase.transferred || 0} Units in QA`;
-                descLabel.textContent = "Final approval move to completed QA inventory";
-                document.getElementById('transfer-qty').max = activePhase.transferred || 0;
-            }
-
-            document.getElementById('transfer-qty').value = "1";
-            document.getElementById('transfer-modal').classList.remove('hidden');
-        };
-
-        window.closeTransferModal = function() {
-            document.getElementById('transfer-modal').classList.add('hidden');
-        };
-
-        window.handleTransferSubmit = async function(e) {
-            e.preventDefault();
-            const type = document.getElementById('transfer-type').value;
-            const qty = Number(document.getElementById('transfer-qty').value);
-            const activePhase = window.appState.phases.find(p => p.id === window.appState.activePhaseId);
-
-            if (!activePhase || qty <= 0) return;
-
-            const ref = doc(db, 'artifacts', window.appState.appId, 'public', 'data', 'production_phases', activePhase.id);
-
-            if (type === 'built_to_qa') {
-                const currentBuilt = Number(activePhase.built || 0);
-                const actualTransfer = Math.min(currentBuilt, qty);
-                await updateDoc(ref, {
-                    built: currentBuilt - actualTransfer,
-                    transferred: Number(activePhase.transferred || 0) + actualTransfer
-                });
-            } else if (type === 'qa_to_approved') {
-                const currentTransferred = Number(activePhase.transferred || 0);
-                const actualApprove = Math.min(currentTransferred, qty);
-                await updateDoc(ref, {
-                    transferred: currentTransferred - actualApprove,
-                    approved: Number(activePhase.approved || 0) + actualApprove
-                });
-            }
-
-            closeTransferModal();
-        };
-
-        // Issues Management
-        window.openAddIssueModal = function() {
-            if (!window.appState.activePhaseId) return;
-            document.getElementById('issue-form').reset();
-            document.getElementById('issue-modal').classList.remove('hidden');
-        };
-
-        window.closeIssueModal = function() {
-            document.getElementById('issue-modal').classList.add('hidden');
-        };
-
-        window.handleIssueSubmit = async function(e) {
-            e.preventDefault();
-            const activePhase = window.appState.phases.find(p => p.id === window.appState.activePhaseId);
-            if (!activePhase) return;
-
-            const title = document.getElementById('issue-title').value.trim();
-            const severity = document.getElementById('issue-severity').value;
-
-            const newIssue = { title, severity, status: 'Open', createdAt: new Date().toISOString() };
-            const currentIssues = activePhase.issues || [];
-
-            const ref = doc(db, 'artifacts', window.appState.appId, 'public', 'data', 'production_phases', activePhase.id);
-            await updateDoc(ref, { issues: [...currentIssues, newIssue] });
-
-            closeIssueModal();
-        };
-
-        window.toggleIssueStatus = async function(phaseId, index) {
-            const phase = window.appState.phases.find(p => p.id === phaseId);
-            if (!phase || !phase.issues) return;
-
-            const updatedIssues = [...phase.issues];
-            updatedIssues[index].status = updatedIssues[index].status === 'Resolved' ? 'Open' : 'Resolved';
-
-            const ref = doc(db, 'artifacts', window.appState.appId, 'public', 'data', 'production_phases', phase.id);
-            await updateDoc(ref, { issues: updatedIssues });
-        };
-
-        // Delete Modal Logic
-        window.openDeleteModal = function(id, name) {
-            window.appState.deleteTargetId = id;
-            document.getElementById('delete-phase-name').textContent = name;
-            document.getElementById('delete-modal').classList.remove('hidden');
-        };
-
-        window.closeDeleteModal = function() {
-            document.getElementById('delete-modal').classList.add('hidden');
-            window.appState.deleteTargetId = null;
-        };
-
-        window.confirmDeletePhase = async function() {
-            const id = window.appState.deleteTargetId;
-            if (!id) return;
-
-            try {
-                const ref = doc(db, 'artifacts', window.appState.appId, 'public', 'data', 'production_phases', id);
-                await deleteDoc(ref);
-                closeDeleteModal();
-            } catch (err) {
-                console.error("Error deleting phase:", err);
-            }
-        };
-    </script>
-</body>
-</html>
+                const isActive = p.id === window.appState.activePhase
