@@ -741,7 +741,7 @@
 
             // Pending Calculations across ALL phases
             const pendingTargetAll = Math.max(0, totalTarget - totalApproved);
-            const pendingBuiltAll = Math.max(0, totalTarget - totalBuilt);
+            const pendingBuiltAll = Math.max(0, totalTarget - totalBuilt - totalTransferred);
             const pendingTransferredAll = Math.max(0, totalTarget - totalTransferred);
             const pendingApprovedAll = Math.max(0, totalTarget - totalApproved);
 
