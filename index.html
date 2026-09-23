@@ -832,7 +832,7 @@
 
             // Pending quantities calculations across all boxes for active phase
             const pendingTarget = Math.max(0, target - approved);
-            const pendingBuilt = Math.max(0, target - built);
+            const pendingBuilt = Math.max(0, target - built- transferred);
             const pendingTransferred = Math.max(0, target - transferred);
             const pendingApproved = Math.max(0, target - approved);
 
