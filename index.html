@@ -761,8 +761,8 @@
 
             // Pending Calculations across ALL phases
             const pendingTargetAll = Math.max(0, totalTarget - totalApproved);
-            const pendingBuiltAll = Math.max(0, totalTarget - totalBuilt - totalTransferred);
-            const pendingTransferredAll = Math.max(0, totalTarget - totalTransferred);
+            const pendingBuiltAll = Math.max(0, totalTarget - totalBuilt - totalTransferred - totalApproved);
+            const pendingTransferredAll = Math.max(0, totalTarget - totalTransferred - totalApproved);
             const pendingApprovedAll = Math.max(0, totalTarget - totalApproved);
 
             const builtPct = totalTarget > 0 ? Math.min(100, Math.round((totalBuilt / totalTarget) * 100)) : 0;
@@ -852,8 +852,8 @@
 
             // Pending quantities calculations across all boxes for active phase
             const pendingTarget = Math.max(0, target - approved);
-            const pendingBuilt = Math.max(0, target - built - transferred);
-            const pendingTransferred = Math.max(0, target - transferred);
+            const pendingBuilt = Math.max(0, target - built - transferred - approved);
+            const pendingTransferred = Math.max(0, target - transferred - approved);
             const pendingApproved = Math.max(0, target - approved);
 
             const cardBuiltPct = target > 0 ? Math.min(100, Math.round((built / target) * 100)) : 0;
@@ -942,8 +942,8 @@
                 const approved = Number(p.approved || p.qaApprovedQty || 0);
 
                 const pendingTarget = Math.max(0, target - approved);
-                const pendingBuilt = Math.max(0, target - built);
-                const pendingTransferred = Math.max(0, target - transferred);
+                const pendingBuilt = Math.max(0, target - built - transferred - approved);
+                const pendingTransferred = Math.max(0, target - transferred - approved);
                 const pendingApproved = Math.max(0, target - approved);
 
                 const issues = p.issues || [];
