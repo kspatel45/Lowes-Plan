@@ -583,7 +583,7 @@
             });
 
             // Pending Calculations across ALL phases
-            const pendingTargetAll = Math.max(0, totalTarget - totalApproved);
+            const pendingTargetAll = Math.max(0, totalTarget - totalBuilt - totalTransferred - totalApproved);
             const pendingBuiltAll = Math.max(0, totalTarget - totalBuilt - totalTransferred - totalApproved);
             const pendingTransferredAll = Math.max(0, totalTarget - totalTransferred - totalApproved);
             const pendingApprovedAll = Math.max(0, totalTarget - totalApproved);
