@@ -773,7 +773,7 @@
             // Card 6: ACTIVE FOCUS
             const activePhase = phases.find(p => p.id === window.appState.activePhaseId);
             document.getElementById('stat-active-name').textContent = activePhase ? activePhase.name : 'None Selected';
-            document.getElementById('stat-total-phases').textContent = `${phases.length} Phase${phases.length === 1 ? '' : 's'} Total`;
+            document.getElementById('stat-total-phases').textContent = `${phases.length} Phase${phases.length === 2 ? '' : 's'} Total`;
 
             // 2. Render Active Phase View
             renderActivePhaseDetails(activePhase);
