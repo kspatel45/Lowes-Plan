@@ -82,7 +82,7 @@
                         LOWE'S PRODUCTION PLAN TRACKER
                     </h1>
                     <p class="text-[11px] text-slate-300 font-medium hidden sm:block">
-                        Locker Assembly Line, QA Transfers & Blocker Notes Control
+                        Locker Assembly Line, Multi-Favorite Focus & QA Transfers Control
                     </p>
                 </div>
             </div>
@@ -95,7 +95,7 @@
                         <span id="status-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span id="status-dot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                     </span>
-                    <span id="status-text" class="text-slate-200">Connecting to Firebase...</span>
+                    <span id="status-text" class="text-slate-200">Connecting...</span>
                 </div>
 
                 <!-- Add New Phase Button -->
@@ -203,37 +203,52 @@
                 </div>
             </div>
 
-            <!-- 6. ACTIVE FOCUS CARD -->
-            <div class="bg-white rounded-xl p-3.5 border border-slate-200 card-shadow flex flex-col justify-between relative overflow-hidden">
+            <!-- 6. FAVORITE PHASES CARD -->
+            <div class="bg-white rounded-xl p-3.5 border border-amber-200 card-shadow flex flex-col justify-between relative overflow-hidden">
                 <div class="flex items-center justify-between mb-1">
-                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">6. ACTIVE FOCUS</span>
+                    <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">6. FAVORITES</span>
                     <div class="p-1 rounded-full text-amber-500 bg-amber-50">
                         <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i>
                     </div>
                 </div>
-                <div class="flex flex-col my-0.5">
-                    <span id="stat-active-name" class="text-sm font-bold text-slate-900 truncate" title="None Active">None Active</span>
-                    <span id="stat-total-phases" class="text-xs font-medium text-slate-400">0 Phases Total</span>
+                <div class="flex items-baseline justify-between my-1">
+                    <span id="stat-favorites-count" class="text-2xl font-black text-amber-600">0</span>
+                    <span id="stat-total-phases" class="text-xs font-medium text-slate-400">0 Total</span>
                 </div>
                 <div class="flex items-center justify-between text-[11px] pt-1 text-slate-500 border-t border-slate-100">
-                    <span>Focus:</span>
-                    <span class="font-bold text-amber-600">Primary Phase</span>
+                    <span>Active Focus:</span>
+                    <span id="stat-active-name" class="font-bold text-amber-700 truncate max-w-[80px]">None</span>
                 </div>
             </div>
 
         </section>
 
-        <!-- ACTIVE PHASE SECTION WITH BIG BOXES & PENDING IN ALL BOXES -->
+        <!-- FAVORITES QUICK-NAV & ACTIVE PHASE SECTION -->
         <section id="active-phase-section" class="bg-white rounded-2xl border border-slate-200 p-5 card-shadow space-y-6">
+            
+            <!-- FAVORITE PHASES QUICK NAV BAR -->
+            <div class="bg-amber-50/60 border border-amber-200/80 rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                <div class="flex items-center space-x-2">
+                    <i data-lucide="star" class="w-4 h-4 text-amber-500 fill-amber-400"></i>
+                    <span class="text-xs font-extrabold text-amber-900 uppercase tracking-wider">Starred Favorites:</span>
+                </div>
+                <div id="favorite-pills-container" class="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
+                    <span class="text-xs text-amber-700 italic">No favorite phases starred yet. Click the star icon on any phase to favorite it.</span>
+                </div>
+            </div>
+
             <!-- Active Phase Header Bar -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
                 <div class="flex items-center space-x-3">
-                    <div class="p-2.5 bg-lowes-navy text-lowes-yellow rounded-xl shadow-sm">
+                    <div class="p-2.5 bg-lowes-navy text-lowes-yellow rounded-xl shadow-sm flex items-center justify-center">
                         <i data-lucide="layers" class="w-6 h-6"></i>
                     </div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="text-[10px] font-black uppercase tracking-wider text-lowes-blue bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Active Phase Focus</span>
+                            <span class="text-[10px] font-black uppercase tracking-wider text-lowes-blue bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Phase Focus View</span>
+                            <span id="active-phase-favorite-badge" class="hidden text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 items-center gap-1">
+                                <i data-lucide="star" class="w-3 h-3 fill-amber-500 text-amber-500"></i> Favorite Phase
+                            </span>
                             <span id="active-phase-status-badge" class="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">In Production</span>
                         </div>
                         <h2 id="active-phase-title" class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-0.5">Select a Phase</h2>
@@ -242,14 +257,18 @@
 
                 <!-- Phase Actions & Switcher Dropdown -->
                 <div class="flex items-center space-x-2">
+                    <button id="toggle-active-fav-btn" onclick="toggleActiveFavorite()" class="hidden bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 transition-colors">
+                        <i data-lucide="star" class="w-3.5 h-3.5 text-amber-500"></i>
+                        <span id="active-fav-btn-label">Star Favorite</span>
+                    </button>
                     <button id="edit-active-btn" onclick="openEditActivePhaseModal()" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 transition-colors">
                         <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
-                        <span>Edit Phase</span>
+                        <span>Edit</span>
                     </button>
                     <div class="flex items-center space-x-1">
-                        <label for="phase-select" class="text-xs font-bold text-slate-600 whitespace-nowrap hidden sm:inline">Change Focus:</label>
+                        <label for="phase-select" class="text-xs font-bold text-slate-600 whitespace-nowrap hidden sm:inline">Focus Phase:</label>
                         <select id="phase-select" onchange="switchActivePhase(this.value)" class="bg-slate-50 border border-slate-300 text-slate-800 text-xs sm:text-sm rounded-lg focus:ring-2 focus:ring-lowes-blue block p-2 font-semibold outline-none">
-                            <option value="">-- Select Active Phase --</option>
+                            <option value="">-- Select Focused Phase --</option>
                         </select>
                     </div>
                 </div>
@@ -443,24 +462,34 @@
             </div>
         </section>
 
-        <!-- ALL PHASES SUMMARY MATRIX TABLE (COMPACT HEIGHTS) -->
+        <!-- ALL PHASES SUMMARY MATRIX TABLE WITH FAVORITES FILTER -->
         <section class="bg-white rounded-2xl border border-slate-200 card-shadow overflow-hidden">
             <!-- Table Header Bar -->
             <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/60">
                 <div>
                     <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
                         <i data-lucide="list-tree" class="w-4 h-4 text-lowes-blue"></i>
-                        <span>All Production Phases Matrix</span>
+                        <span>Production Phases Matrix</span>
                     </h3>
                     <p class="text-xs text-slate-500 mt-0.5">Summary matrix of target lockers, progress stages, dates, and pending units</p>
                 </div>
-                <div class="flex items-center space-x-2">
+                
+                <!-- Table Controls & Favorite Filter Toggle -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- Filter Toggle Buttons -->
+                    <div class="flex items-center bg-slate-200/80 p-0.5 rounded-lg text-xs font-bold">
+                        <button id="filter-all-btn" onclick="setTableFilter('all')" class="px-3 py-1 rounded-md bg-white text-slate-900 shadow-2xs">
+                            All (<span id="filter-all-count">0</span>)
+                        </button>
+                        <button id="filter-fav-btn" onclick="setTableFilter('favorites')" class="px-3 py-1 rounded-md text-slate-600 hover:text-amber-800 flex items-center gap-1">
+                            <i data-lucide="star" class="w-3 h-3 text-amber-500 fill-amber-400"></i>
+                            <span>Favorites (<span id="filter-fav-count">0</span>)</span>
+                        </button>
+                    </div>
+
                     <button id="seed-data-btn" onclick="seedDefaultPhases()" class="hidden text-xs bg-lowes-lightBlue hover:bg-blue-100 text-lowes-blue font-bold px-3 py-1.5 rounded-lg border border-blue-200 transition-colors">
                         Initialize Demo Phases
                     </button>
-                    <div class="text-xs text-slate-600 font-medium bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
-                        Total Phases: <span id="table-total-count" class="font-bold text-slate-900">0</span>
-                    </div>
                 </div>
             </div>
 
@@ -469,6 +498,7 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-slate-100/90 text-slate-600 text-[11px] font-bold uppercase tracking-wider border-b border-slate-200">
+                            <th class="py-2 px-3 text-center w-10">★</th>
                             <th class="py-2 px-3">Phase Name</th>
                             <th class="py-2 px-3 text-right">Target (Pending)</th>
                             <th class="py-2 px-3 text-right">Built MFG (Pending)</th>
@@ -481,7 +511,7 @@
                     </thead>
                     <tbody id="phases-table-body" class="divide-y divide-slate-100 text-xs">
                         <tr>
-                            <td colspan="8" class="py-6 text-center text-slate-400 font-medium">
+                            <td colspan="9" class="py-6 text-center text-slate-400 font-medium">
                                 Connecting to Firebase Database...
                             </td>
                         </tr>
@@ -565,9 +595,12 @@
                     </div>
                 </div>
 
-                <div class="flex items-center space-x-2 pt-2">
-                    <input type="checkbox" id="phase-active-check" class="rounded text-lowes-blue focus:ring-lowes-blue h-4 w-4">
-                    <label for="phase-active-check" class="text-xs font-bold text-slate-800">Set as Active Focus Phase</label>
+                <div class="flex items-center space-x-2 pt-2 bg-amber-50/80 p-2.5 rounded-xl border border-amber-200">
+                    <input type="checkbox" id="phase-favorite-check" class="rounded text-amber-500 focus:ring-amber-400 h-4 w-4">
+                    <label for="phase-favorite-check" class="text-xs font-bold text-amber-900 flex items-center gap-1">
+                        <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400 text-amber-500"></i>
+                        <span>Mark as Favorite Phase (Allows Multi-Favorites)</span>
+                    </label>
                 </div>
 
                 <div class="flex justify-end space-x-2 pt-4 border-t border-slate-100">
@@ -638,6 +671,7 @@
         window.appState = {
             phases: [],
             activePhaseId: null,
+            tableFilter: 'all', // 'all' or 'favorites'
             deleteTargetId: null,
             db: null,
             phasesCol: null
@@ -693,13 +727,12 @@
                     seedBtn.classList.add('hidden');
                 }
 
-                // Maintain or select active phase
+                // Maintain active phase selection
                 if (loadedPhases.length > 0) {
-                    const activeObj = loadedPhases.find(p => p.isActive);
-                    if (activeObj) {
-                        window.appState.activePhaseId = activeObj.id;
-                    } else if (!window.appState.activePhaseId || !loadedPhases.some(p => p.id === window.appState.activePhaseId)) {
-                        window.appState.activePhaseId = loadedPhases[0].id;
+                    if (!window.appState.activePhaseId || !loadedPhases.some(p => p.id === window.appState.activePhaseId)) {
+                        // Prefer first favorite, otherwise first phase
+                        const firstFav = loadedPhases.find(p => p.isFavorite || p.isActive);
+                        window.appState.activePhaseId = firstFav ? firstFav.id : loadedPhases[0].id;
                     }
                 } else {
                     window.appState.activePhaseId = null;
@@ -742,12 +775,15 @@
             let totalApproved = 0;
             let totalOpenIssues = 0;
             let totalHighIssues = 0;
+            let favoriteCount = 0;
 
             phases.forEach(p => {
                 totalTarget += Number(p.target || p.targetQty || 0);
                 totalBuilt += Number(p.built || p.builtQty || 0);
                 totalTransferred += Number(p.transferred || p.transferredQty || 0);
                 totalApproved += Number(p.approved || p.qaApprovedQty || 0);
+
+                if (p.isFavorite) favoriteCount++;
 
                 if (Array.isArray(p.issues)) {
                     p.issues.forEach(iss => {
@@ -792,34 +828,56 @@
             document.getElementById('stat-issues').textContent = totalOpenIssues;
             document.getElementById('stat-high-issues').textContent = `${totalHighIssues} High`;
 
-            // Card 6: ACTIVE FOCUS
+            // Card 6: FAVORITE PHASES
             const activePhase = phases.find(p => p.id === window.appState.activePhaseId);
-            document.getElementById('stat-active-name').textContent = activePhase ? activePhase.name : 'None Selected';
-            document.getElementById('stat-total-phases').textContent = `${phases.length} Phase${phases.length === 1 ? '' : 's'} Total`;
+            document.getElementById('stat-favorites-count').textContent = favoriteCount;
+            document.getElementById('stat-total-phases').textContent = `${phases.length} Total`;
+            document.getElementById('stat-active-name').textContent = activePhase ? activePhase.name : 'None';
 
-            // 2. Render Active Phase View
+            // 2. Render Favorites Navigation Pills
+            renderFavoritePills(phases);
+
+            // 3. Render Active Phase View
             renderActivePhaseDetails(activePhase);
 
-            // 3. Render Phase Switcher Dropdown
+            // 4. Render Phase Switcher Dropdown
             const selectEl = document.getElementById('phase-select');
-            selectEl.innerHTML = '<option value="">-- Select Active Phase --</option>';
+            selectEl.innerHTML = '<option value="">-- Select Focus Phase --</option>';
             phases.forEach(p => {
                 const opt = document.createElement('option');
                 opt.value = p.id;
-                opt.textContent = `${p.name} (${p.status || 'In Production'})`;
+                opt.textContent = `${p.isFavorite ? '★ ' : ''}${p.name} (${p.status || 'In Production'})`;
                 if (p.id === window.appState.activePhaseId) opt.selected = true;
                 selectEl.appendChild(opt);
             });
 
-            // Toggle Edit Active Button visibility
+            // Toggle Actions visibility for active phase
             const editBtn = document.getElementById('edit-active-btn');
+            const favBtn = document.getElementById('toggle-active-fav-btn');
+            const favLabel = document.getElementById('active-fav-btn-label');
+            const favBadge = document.getElementById('active-phase-favorite-badge');
+
             if (activePhase) {
                 editBtn.classList.remove('hidden');
+                favBtn.classList.remove('hidden');
+                if (activePhase.isFavorite) {
+                    favLabel.textContent = 'Unstar';
+                    favBadge.classList.remove('hidden');
+                    favBadge.classList.add('flex');
+                } else {
+                    favLabel.textContent = 'Star Favorite';
+                    favBadge.classList.add('hidden');
+                    favBadge.classList.remove('flex');
+                }
             } else {
                 editBtn.classList.add('hidden');
+                favBtn.classList.add('hidden');
+                favBadge.classList.add('hidden');
             }
 
-            // 4. Render Summary Matrix Table
+            // 5. Render Summary Matrix Table & Filters
+            document.getElementById('filter-all-count').textContent = phases.length;
+            document.getElementById('filter-fav-count').textContent = favoriteCount;
             renderPhasesTable(phases);
 
             // Re-render Lucide icons
@@ -827,6 +885,32 @@
                 window.lucide.createIcons();
             }
         };
+
+        function renderFavoritePills(phases) {
+            const container = document.getElementById('favorite-pills-container');
+            const favorites = phases.filter(p => p.isFavorite);
+
+            if (favorites.length === 0) {
+                container.innerHTML = `<span class="text-xs text-amber-800/80 italic">No favorite phases starred yet. Click the star icon on any phase to favorite it.</span>`;
+                return;
+            }
+
+            container.innerHTML = favorites.map(p => {
+                const isActive = p.id === window.appState.activePhaseId;
+                return `
+                    <button onclick="switchActivePhase('${p.id}')" 
+                            class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border ${
+                                isActive 
+                                    ? 'bg-amber-500 text-white border-amber-600 shadow-xs' 
+                                    : 'bg-white hover:bg-amber-100 text-amber-900 border-amber-300'
+                            }">
+                        <i data-lucide="star" class="w-3 h-3 ${isActive ? 'fill-white' : 'fill-amber-400 text-amber-500'}"></i>
+                        <span>${p.name}</span>
+                        <span onclick="toggleFavorite('${p.id}', event)" class="hover:text-rose-600 ml-1 p-0.5" title="Unstar favorite">&times;</span>
+                    </button>
+                `;
+            }).join('');
+        }
 
         function renderActivePhaseDetails(phase) {
             if (!phase) {
@@ -837,7 +921,7 @@
                 document.getElementById('active-card-approved').textContent = "0";
                 document.getElementById('active-phase-issues-container').innerHTML = `
                     <div class="text-xs text-slate-400 italic py-4 text-center bg-slate-50 rounded-lg">
-                        Select or create a production phase to view active focus details.
+                        Select or create a production phase to view focus details.
                     </div>`;
                 return;
             }
@@ -921,21 +1005,43 @@
             }
         }
 
+        window.setTableFilter = function(mode) {
+            window.appState.tableFilter = mode;
+            const allBtn = document.getElementById('filter-all-btn');
+            const favBtn = document.getElementById('filter-fav-btn');
+
+            if (mode === 'favorites') {
+                favBtn.className = "px-3 py-1 rounded-md bg-amber-500 text-white font-bold shadow-2xs flex items-center gap-1";
+                allBtn.className = "px-3 py-1 rounded-md text-slate-600 hover:text-slate-900 font-bold";
+            } else {
+                allBtn.className = "px-3 py-1 rounded-md bg-white text-slate-900 font-bold shadow-2xs";
+                favBtn.className = "px-3 py-1 rounded-md text-slate-600 hover:text-amber-800 font-bold flex items-center gap-1";
+            }
+
+            renderPhasesTable(window.appState.phases);
+            if (window.lucide) window.lucide.createIcons();
+        };
+
         function renderPhasesTable(phases) {
             const tbody = document.getElementById('phases-table-body');
-            document.getElementById('table-total-count').textContent = phases.length;
+            const filterMode = window.appState.tableFilter;
 
-            if (phases.length === 0) {
+            let displayedPhases = phases;
+            if (filterMode === 'favorites') {
+                displayedPhases = phases.filter(p => p.isFavorite);
+            }
+
+            if (displayedPhases.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="8" class="py-6 text-center text-slate-400 font-medium">
-                            No production phases found in Firebase. Click <strong>"+ New Phase"</strong> to add one.
+                        <td colspan="9" class="py-6 text-center text-slate-400 font-medium">
+                            ${filterMode === 'favorites' ? 'No favorite phases starred yet. Click the star icon on any row to favorite it.' : 'No production phases found in Firebase. Click <strong>"+ New Phase"</strong> to add one.'}
                         </td>
                     </tr>`;
                 return;
             }
 
-            tbody.innerHTML = phases.map(p => {
+            tbody.innerHTML = displayedPhases.map(p => {
                 const target = Number(p.target || p.targetQty || 0);
                 const built = Number(p.built || p.builtQty || 0);
                 const transferred = Number(p.transferred || p.transferredQty || 0);
@@ -949,12 +1055,18 @@
                 const issues = p.issues || [];
                 const openBlockers = issues.filter(i => i.status === 'Open' || !i.status).length;
                 const isActive = p.id === window.appState.activePhaseId;
+                const isFav = !!p.isFavorite;
 
                 return `
                     <tr class="${isActive ? 'bg-blue-50/50 font-semibold' : 'hover:bg-slate-50'} transition-colors">
+                        <td class="py-1.5 px-3 text-center">
+                            <button onclick="toggleFavorite('${p.id}', event)" class="p-1 rounded hover:bg-amber-100/60 transition-colors" title="${isFav ? 'Unstar Favorite' : 'Star Favorite'}">
+                                <i data-lucide="star" class="w-4 h-4 ${isFav ? 'fill-amber-400 text-amber-500' : 'text-slate-300 hover:text-amber-400'}"></i>
+                            </button>
+                        </td>
                         <td class="py-1.5 px-3">
                             <div class="flex items-center space-x-2">
-                                ${isActive ? '<span class="w-2 h-2 rounded-full bg-lowes-blue"></span>' : ''}
+                                ${isActive ? '<span class="w-2 h-2 rounded-full bg-lowes-blue" title="Active Focus"></span>' : ''}
                                 <span class="font-bold text-slate-900">${p.name}</span>
                                 <span class="text-[10px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 border border-slate-200">${p.status || 'In Production'}</span>
                             </div>
@@ -983,13 +1095,9 @@
                         <td class="py-1.5 px-3 text-center text-slate-500">${p.estDate || p.estBuildDate || 'TBD'}</td>
                         <td class="py-1.5 px-3 text-center">
                             <div class="flex items-center justify-center space-x-1">
-                                ${!isActive ? `
-                                    <button onclick="switchActivePhase('${p.id}')" title="Set Active Focus" class="p-1 text-slate-400 hover:text-lowes-blue hover:bg-blue-50 rounded">
-                                        <i data-lucide="star" class="w-3.5 h-3.5"></i>
-                                    </button>
-                                ` : `
-                                    <span title="Active Focus Phase" class="p-1 text-amber-500"><i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400"></i></span>
-                                `}
+                                <button onclick="switchActivePhase('${p.id}')" title="Set Focus View" class="p-1 text-slate-400 hover:text-lowes-blue hover:bg-blue-50 rounded">
+                                    <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                                </button>
                                 <button onclick="openEditPhaseModal('${p.id}')" title="Edit Phase" class="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded">
                                     <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
                                 </button>
@@ -1003,24 +1111,24 @@
             }).join('');
         }
 
+        window.toggleFavorite = function(phaseId, event) {
+            if (event) event.stopPropagation();
+            const phase = window.appState.phases.find(p => p.id === phaseId);
+            if (!phase) return;
+
+            const nextFav = !phase.isFavorite;
+            phasesCol.doc(phaseId).update({ isFavorite: nextFav }).catch(err => console.error("Error toggling favorite:", err));
+        };
+
+        window.toggleActiveFavorite = function() {
+            if (!window.appState.activePhaseId) return;
+            window.toggleFavorite(window.appState.activePhaseId);
+        };
+
         window.switchActivePhase = function(phaseId) {
             if (!phaseId) return;
-            
-            // Unset current active flags in Firestore
-            const batch = db.batch();
-            window.appState.phases.forEach(p => {
-                if (p.isActive) {
-                    batch.update(phasesCol.doc(p.id), { isActive: false });
-                }
-            });
-
-            // Set chosen phase as active
-            batch.update(phasesCol.doc(phaseId), { isActive: true });
-
-            batch.commit().then(() => {
-                window.appState.activePhaseId = phaseId;
-                renderUI();
-            }).catch(err => console.error("Error setting active phase:", err));
+            window.appState.activePhaseId = phaseId;
+            renderUI();
         };
 
         window.quickIncrementBuilt = function(amount) {
@@ -1117,7 +1225,7 @@
             const actualDate = document.getElementById('phase-actual-date').value;
             const qaDate = document.getElementById('phase-qa-date').value;
             const approvalDate = document.getElementById('phase-approval-date').value;
-            const isActive = document.getElementById('phase-active-check').checked;
+            const isFavorite = document.getElementById('phase-favorite-check').checked;
 
             const phaseData = {
                 name,
@@ -1130,17 +1238,8 @@
                 actualDate,
                 qaDate,
                 approvalDate,
-                isActive
+                isFavorite
             };
-
-            if (isActive) {
-                // Deactivate others
-                window.appState.phases.forEach(p => {
-                    if (p.id !== id && p.isActive) {
-                        phasesCol.doc(p.id).update({ isActive: false });
-                    }
-                });
-            }
 
             if (id) {
                 phasesCol.doc(id).update(phaseData).then(() => {
@@ -1150,7 +1249,7 @@
                 phaseData.issues = [];
                 phaseData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
                 phasesCol.add(phaseData).then((docRef) => {
-                    if (isActive) window.appState.activePhaseId = docRef.id;
+                    window.appState.activePhaseId = docRef.id;
                     closePhaseModal();
                 }).catch(err => console.error("Error creating phase:", err));
             }
@@ -1213,7 +1312,7 @@
             document.getElementById('phase-actual-date').value = '';
             document.getElementById('phase-qa-date').value = '';
             document.getElementById('phase-approval-date').value = '';
-            document.getElementById('phase-active-check').checked = window.appState.phases.length === 0;
+            document.getElementById('phase-favorite-check').checked = false;
 
             document.getElementById('phase-modal').classList.remove('hidden');
         };
@@ -1234,7 +1333,7 @@
             document.getElementById('phase-actual-date').value = phase.actualDate || phase.actualBuildDate || '';
             document.getElementById('phase-qa-date').value = phase.qaDate || '';
             document.getElementById('phase-approval-date').value = phase.approvalDate || '';
-            document.getElementById('phase-active-check').checked = !!phase.isActive;
+            document.getElementById('phase-favorite-check').checked = !!phase.isFavorite;
 
             document.getElementById('phase-modal').classList.remove('hidden');
         };
@@ -1384,7 +1483,7 @@
                     actualDate: "2026-09-20",
                     qaDate: "2026-09-22",
                     approvalDate: "2026-09-23",
-                    isActive: true,
+                    isFavorite: true,
                     issues: [
                         { title: "Hinge mounting bracket delay from supplier", severity: "High", status: "Open", createdAt: new Date().toISOString() }
                     ]
@@ -1397,7 +1496,18 @@
                     approved: 0,
                     status: "In Production",
                     estDate: "2026-11-01",
-                    isActive: false,
+                    isFavorite: true,
+                    issues: []
+                },
+                {
+                    name: "Phase 3 - Northeast Express Expansion",
+                    target: 50,
+                    built: 0,
+                    transferred: 0,
+                    approved: 0,
+                    status: "Planning",
+                    estDate: "2026-12-05",
+                    isFavorite: false,
                     issues: []
                 }
             ];
